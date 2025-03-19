@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import { onMount, tick } from 'svelte';
     import { STORE } from '$lib/store.svelte';
 
     let devoirs = $state([]);
@@ -7,6 +7,8 @@
     onMount(async () => {
         const response = await fetch('/api/devoirs');
         devoirs = await response.json();
+        devoirs = devoirs.map(devoir => ({ ...devoir, votes: { verifier: 0, refuser: 0 }, userVote: null }));
+        startCountdown();
     });
 
     async function handleVote(devoir_id: number, vote: number) {
@@ -16,7 +18,20 @@
                 body: JSON.stringify({ devoir_id, vote })
             });
             const data = await response.json();
-            console.log(data.message);
+            const index = devoirs.findIndex(d => d.id === devoir_id);
+            if (index !== -1) {
+                if (devoirs[index].userVote === vote) {
+                    devoirs[index].votes[vote === 1 ? 'verifier' : 'refuser']--;
+                    devoirs[index].userVote = null;
+                } else {
+                    if (devoirs[index].userVote !== null) {
+                        devoirs[index].votes[devoirs[index].userVote === 1 ? 'verifier' : 'refuser']--;
+                    }
+                    devoirs[index].votes[vote === 1 ? 'verifier' : 'refuser']++;
+                    devoirs[index].userVote = vote;
+                }
+                await tick();
+            }
         } catch (error) {
             console.error('Erreur lors du vote', error);
         }
@@ -28,35 +43,47 @@
         const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
         const minutes = Math.floor((total / (1000 * 60)) % 60);
         const seconds = Math.floor((total / 1000) % 60);
-
         return { total, days, hours, minutes, seconds };
+    }
+
+    function startCountdown() {
+        setInterval(() => {
+            devoirs = devoirs.map(devoir => {
+                const time = getTimeRemaining(devoir.expire_le_timestamp);
+                return { ...devoir, time };
+            });
+        }, 1000);
     }
 </script>
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
     {#each devoirs.slice(0, 6) as devoir}
-        <div class="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-300">
+        <div class="bg-white shadow-lg rounded-lg overflow-hidden border border-gray-300 w-full max-w-xl mx-auto">
             <div class="relative">
                 <img src="/fond-devoirs.jpeg" alt="Devoir" class="w-full h-40 object-cover">
             </div>
             <div class="p-4">
-                <h2 class="text-lg font-semibold">{devoir.matiere}</h2>
+                <h2 class="text-lg font-bold">{devoir.matiere}</h2>
                 <div class="flex justify-between items-center mt-2">
-                    <p class="text-gray-900 text-md font-bold">Exercice {devoir.id}</p>
-                    <span class="text-gray-700 text-sm">
-                        {#if getTimeRemaining(devoir.expire_le_timestamp).total > 0}
-                            {getTimeRemaining(devoir.expire_le_timestamp).days}j {getTimeRemaining(devoir.expire_le_timestamp).hours}h {getTimeRemaining(devoir.expire_le_timestamp).minutes}m
+                    <p class="text-gray-900 text-sm font-bold">Exercice {devoir.id}</p>
+                    <span class="text-gray-700 text-xs bg-gray-200 px-3 py-1 rounded-lg">
+                        {#if devoir.time.total > 0}
+                            {devoir.time.days}j {devoir.time.hours}h {devoir.time.minutes}m {devoir.time.seconds}s
                         {:else}
                             Expiré
                         {/if}
                     </span>
                 </div>
                 <div class="flex justify-center items-center mt-4 space-x-4">
-                    <button on:click={() => handleVote(devoir.id, 1)} class="p-2">
-                        <img src="/verifier.png" alt="Verifier" class="w-8 h-8">
+                    <button on:click={() => handleVote(devoir.id, 1)} 
+                        class="flex items-center bg-[#FDEFCC] text-black px-3 py-1 rounded-lg shadow transition-opacity duration-300 opacity-100 hover:opacity-75">
+                        <img src="/verifier.png" alt="Vérifier" class="w-4 h-4 mr-2 opacity-80 hover:opacity-65 transition-opacity duration-300">
+                        {devoir.votes.verifier}
                     </button>
-                    <button on:click={() => handleVote(devoir.id, -1)} class="p-2">
-                        <img src="/refuser.png" alt="Refuser" class="w-8 h-8">
+                    <button on:click={() => handleVote(devoir.id, -1)} 
+                        class="flex items-center bg-[#DBD7E3] text-black px-3 py-1 rounded-lg shadow transition-opacity duration-300 opacity-100 hover:opacity-75">
+                        <img src="/refuser.png" alt="Refuser" class="w-4 h-4 mr-2 opacity-80 hover:opacity-65 transition-opacity duration-300">
+                        {devoir.votes.refuser}
                     </button>
                 </div>
             </div>
