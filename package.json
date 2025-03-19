@@ -37,8 +37,15 @@
 	},
 	"dependencies": {
 		"@inlang/paraglide-sveltekit": "^0.15.5",
+		"@tiptap/core": "^2.11.5",
+		"@tiptap/extension-color": "^2.11.5",
+		"@tiptap/extension-list-item": "^2.11.5",
+		"@tiptap/extension-text-style": "^2.11.5",
+		"@tiptap/starter-kit": "^2.11.5",
 		"bcrypt": "^5.1.1",
 		"better-sqlite3": "^11.8.0",
-		"drizzle-orm": "^0.40.0"
+		"drizzle-orm": "^0.40.0",
+		"tiptap": "^1.32.2",
+		"tiptap-markdown": "^0.8.10"
 	}
 }

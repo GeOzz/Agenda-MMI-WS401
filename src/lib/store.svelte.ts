@@ -1,4 +1,9 @@
-export const STORE = $state({
+import type { IUtilisateur } from './interfaces/IUtilisateur';
+
+export const STORE: {
+	connected: boolean;
+	utilisateur: IUtilisateur | null;
+} = $state({
 	connected: false,
 	utilisateur: null
 });
