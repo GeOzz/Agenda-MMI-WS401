@@ -30,7 +30,7 @@ export const devoirs = sqliteTable('devoirs', {
 	timestamp: integer('timestamp')
 });
 
-export const votes = sqliteTable('votes', {
+export const votes_devoir = sqliteTable('votes_devoir', {
 	id: integer('id').primaryKey(),
 	devoir_id: integer('devoir_id').references(() => devoirs.id),
 	utilisateur_id: integer('utilisateur_id').references(() => utilisateurs.id),
