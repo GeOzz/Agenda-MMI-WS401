@@ -1,0 +1,44 @@
+{
+	"name": "test33",
+	"private": true,
+	"version": "0.0.1",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"format": "prettier --write .",
+		"lint": "prettier --check .",
+		"db:push": "drizzle-kit push",
+		"db:migrate": "drizzle-kit migrate",
+		"db:studio": "drizzle-kit studio"
+	},
+	"devDependencies": {
+		"@iconify-json/ph": "^1.2.2",
+		"@julr/unocss-preset-forms": "^1.0.0",
+		"@sveltejs/adapter-auto": "^4.0.0",
+		"@sveltejs/kit": "^2.16.0",
+		"@sveltejs/vite-plugin-svelte": "^5.0.0",
+		"@types/bcrypt": "^5.0.2",
+		"@types/better-sqlite3": "^7.6.12",
+		"@unocss/preset-icons": "^66.1.0-beta.5",
+		"drizzle-kit": "^0.30.2",
+		"nanoid": "^5.1.4",
+		"prettier": "^3.4.2",
+		"prettier-plugin-svelte": "^3.3.3",
+		"svelte": "^5.0.0",
+		"svelte-check": "^4.0.0",
+		"typescript": "^5.0.0",
+		"unocss": "^66.1.0-beta.5",
+		"vite": "^6.0.0"
+	},
+	"dependencies": {
+		"@inlang/paraglide-sveltekit": "^0.15.5",
+		"bcrypt": "^5.1.1",
+		"better-sqlite3": "^11.8.0",
+		"drizzle-orm": "^0.40.0"
+	}
+}
