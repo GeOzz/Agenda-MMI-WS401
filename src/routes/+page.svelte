@@ -285,56 +285,6 @@
 					{/each}
 				</div>
 			</main>
-			<div class=" h-full w-100 bg-gray-200 p-4 shadow-lg block overflow-y-scroll hidden sm:block!">
-				<nav class="space-y-4">
-					<!-- Navigation header -->
-					<div class="text-gray-500 mb-6">
-						<h2 class="text-sm font-medium">Navigation</h2>
-						<div class="mt-2 space-y-2">
-							<button
-								class="flex items-center space-x-2 text-gray-600 hover:bg-gray-100 w-full p-2 rounded"
-							>
-								<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-									<path d="M4 4h4v4H4V4zm6 0h4v4h-4V4zm6 0h4v4h-4V4z" />
-								</svg>
-								<span>Vue en grille</span>
-							</button>
-							<button
-								class="flex items-center space-x-2 text-gray-600 hover:bg-gray-100 w-full p-2 rounded"
-							>
-								<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-									<path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-								</svg>
-								<span>Mode sombre</span>
-							</button>
-						</div>
-					</div>
-
-					<!-- Recent views -->
-					<div class="text-gray-500">
-						<h2 class="text-sm font-medium mb-2">Vus récemment</h2>
-						<div class="space-y-2">
-							{#each semesters[0].modules as module}
-								<div
-									class="flex items-center space-x-2 text-gray-600 hover:bIPromotion0 p-2 rounded cursor-pointer"
-								>
-									<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-										<path
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-										/>
-									</svg>
-									<span class="text-sm">{module.code} - {module.name}</span>
-								</div>
-							{/each}
-						</div>
-					</div>
-				</nav>
-			</div>
 		</div>
 	{/if}
-{:catch error}
-	<!-- promise was rejected -->
 {/await}
