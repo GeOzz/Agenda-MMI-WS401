@@ -8,6 +8,26 @@ export interface IUtilisateur {
 	groupeTD: string;
 	groupeTP: string;
 }
+
+export interface IDevoir {
+	id: number;
+	promotion: string;
+	matiere: string;
+	markdown: string;
+	utilisateur_id_createur: number;
+	expire_le_timestamp: number;
+	groupes: string[];
+	timestamp: number;
+}
+
+export interface VoteDevoir {
+	id: number;
+	devoir_id: number;
+	utilisateur_id: number;
+	vote: number;
+	timestamp: number;
+}
+
 export enum EPromotion {
 	PREMIERE_ANNEE = '1ère Année (BUT1)',
 	DEUXIEME_ANNEE = '2ème Année (BUT2)',
