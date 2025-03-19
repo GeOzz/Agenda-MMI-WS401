@@ -11,6 +11,8 @@
 			const UTILISATEUR_EXISTANT = REPONSE.status !== 200;
 			if (UTILISATEUR_EXISTANT) {
 				erreur = 'Utilisateur deja existant';
+			} else {
+				window.location.href = '/connexion';
 			}
 		} catch (erreur) {
 			erreur = "Erreur lors de l'inscription";
