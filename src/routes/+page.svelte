@@ -45,39 +45,59 @@
 		const seconds = Math.floor((total / 1000) % 60);
 		return { total, days, hours, minutes, seconds };
 	}
+
+	function handleVoirPlus(devoir_id: number) {
+		window.location.href = `/devoir/${devoir_id}`;
+	}
+
+	function handleAFaire(devoir_id: number) {
+		const index = DEVOIRS.findIndex(d => d.id === devoir_id);
+		if (index !== -1) {
+			DEVOIRS[index].status = 'a_faire';
+			DEVOIRS.sort((a, b) => (a.status === 'a_faire' ? -1 : 1));
+		}
+	}
+
+	function handleDejaFait(devoir_id: number) {
+		const index = DEVOIRS.findIndex(d => d.id === devoir_id);
+		if (index !== -1) {
+			DEVOIRS[index].status = 'deja_fait';
+			DEVOIRS.sort((a, b) => (a.status === 'deja_fait' ? 1 : -1));
+		}
+	}
 </script>
 
 {#await AfficherOuNon then value}
 	{#if STORE.connected === true}
 		<div class="max-w-7xl mx-auto p-6">
 			<h1 class="text-4xl font-bold mb-6">
-				Bienvenue ETUDIANT, vous avez {DEVOIRS.length} devoirs à rendre.
+				Bienvenue {STORE.utilisateur?.nom}, vous avez {DEVOIRS.length} devoirs à rendre.
 			</h1>
 
 			<div class="space-y-4 mb-8">
 				{#each DEVOIRS as devoir}
-					<div class="bg-white shadow-md rounded-lg p-6 border border-gray-300">
-						<div class="flex justify-between items-center mb-4">
-							<div>
-								<h2 class="text-xl font-semibold">{devoir.matiere} - {devoir.titre}</h2>
-								<p class="text-gray-500">
-									Rendu prévu pour le {new Date(devoir.expire_le_timestamp).toLocaleDateString(
-										'fr-FR'
-									)}
-									à {new Date(devoir.expire_le_timestamp).toLocaleTimeString('fr-FR')}
-								</p>
+					<div class="bg-white shadow-md rounded-lg p-6 border border-gray-300 flex justify-between items-center {devoir.status === 'deja_fait' ? 'opacity-50' : ''}">
+						<div class="flex items-center">
+							<div class="w-12 h-12 rounded-full bg-[#4D3677] flex items-center justify-center text-white font-bold">
+								{devoir.matiere.slice(0, 2).toUpperCase()}
 							</div>
-							<div class="flex space-x-2">
-								<button class="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600"
-									>À faire</button
-								>
-								<a
-									href={`/devoir/${devoir.id}`}
-									class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600">Voir</a
-								>
+							<div class="ml-4">
+								<h2 class="text-xl font-semibold">{devoir.matiere} - {devoir.titre}</h2>
+								<p class="text-gray-500">Ajouté par Étudiant le {new Date(devoir.timestamp).toLocaleDateString('fr-FR')} à {new Date(devoir.timestamp).toLocaleTimeString('fr-FR')}</p>
+								<p class="text-gray-500">Rendu prévu pour le {new Date(devoir.expire_le_timestamp).toLocaleDateString('fr-FR')} à {new Date(devoir.expire_le_timestamp).toLocaleTimeString('fr-FR')}</p>
 							</div>
 						</div>
-						<p class="text-gray-700">{devoir.description}</p>
+						<div class="border-l border-gray-300 h-full mx-4"></div>
+						<div class="flex-1">
+							<p class="text-sm text-gray-800">{devoir.description}</p>
+							<div class="flex justify-between items-center mt-2">
+								<button on:click={() => handleVoirPlus(devoir.id)} class="px-4 py-2 bg-[#9385AB] bg-opacity-90 text-[#3B2A5B] font-bold rounded-md hover:bg-opacity-100">Voir plus</button>
+								<div class="flex space-x-2">
+									<button on:click={() => handleAFaire(devoir.id)} class="px-4 py-2 bg-[#F7B000] text-[#3B2A5B] font-bold rounded-md hover:bg-[#D69A00]">À faire</button>
+									<button on:click={() => handleDejaFait(devoir.id)} class="px-4 py-2 bg-[#DDD4EC] text-[#3B2A5B] font-bold rounded-md">Déjà fait</button>
+								</div>
+							</div>
+						</div>
 					</div>
 				{/each}
 			</div>
