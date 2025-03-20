@@ -16,6 +16,7 @@
 	const groupes_options = [...Object.values(EGroupeTD), ...Object.values(EGroupeTP)];
 
 	let markdown = $state('');
+	let titre = $state('');
 
 	let element;
 	let editor = $state<Editor | null>(null);
@@ -67,7 +68,14 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 	async function handleSubmit(event: Event) {
 		event.preventDefault();
 		markdown = editor ? editor.storage.markdown.getMarkdown() : '';
-		console.log(promotion, selectedMatiere, expire_le_timestamp, groupes.join(','), markdown);
+		console.log(
+			promotion,
+			selectedMatiere,
+			expire_le_timestamp,
+			groupes.join(','),
+			markdown,
+			titre
+		);
 		try {
 			console.log(new Date(expire_le_timestamp).getTime());
 			const RESPONSE = await fetch('/api/devoirs', {
@@ -77,7 +85,8 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 					matiere: selectedMatiere,
 					expire_le_timestamp: new Date(expire_le_timestamp).getTime(),
 					groupes: groupes.join(','),
-					markdown
+					markdown,
+					titre
 				})
 			});
 			const data = await RESPONSE.json();
@@ -187,7 +196,17 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 			</div>
 		</div>
 
+		<div>
+			<label class="block text-sm font-medium text-gray-700 mb-2">Titre du devoir</label>
+			<input
+				type="text"
+				bind:value={titre}
+				class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+			/>
+		</div>
+
 		<div class="border border-gray-300 rounded-md p-4 min-h-[300px]">
+			<label class="block text-sm font-medium text-gray-700 mb-2">Contenu du devoir</label>
 			{#if editor}
 				<div class="control-group">
 					<div class="flex flex-wrap gap-2 p-2 border-b border-gray-200 mb-3">
