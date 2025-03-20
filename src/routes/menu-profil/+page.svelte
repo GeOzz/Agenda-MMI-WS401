@@ -60,96 +60,127 @@
 	});
 </script>
 
-<div class="p-6 max-w-2xl mx-auto bg-white shadow-lg rounded-lg">
-	<h1 class="text-3xl font-bold mb-6">Détails du Profil</h1>
-	<p class="text-gray-600 mb-6">
-		Gérez les détails de votre compte qui représentent comment les autres utilisateurs vous voient,
-		en plus d'autres détails utilisés pour la communication et la personnalisation du système.
-	</p>
-	<div class="space-y-4">
-		<div class="flex space-x-4">
-			<div class="flex-1 relative">
-				<label class="block text-gray-700 font-bold">Nom</label>
-				<div class="relative">
-					<input
-						type="text"
-						value={utilisateur.nom}
-						class="w-full p-2 border border-gray-300 rounded bg-gray-100 cursor-default"
-						readonly
-					/>
-					<div class="absolute inset-0 diagonal-stripes pointer-events-none"></div>
+<div class="flex">
+	<!-- Menu de navigation à gauche -->
+	<nav
+		class="w-64 h-screen bg-gray-100 text-black flex flex-col fixed top-0 left-0 overflow-y-auto"
+	>
+		<div class="p-4">
+			<h2 class="text-2xl font-bold">Menu</h2>
+		</div>
+		<ul class="flex-1 p-4 space-y-2">
+			<li><a href="/" class="block px-4 py-2 rounded hover:bg-gray-700">Accueil</a></li>
+			<li>
+				<a href="/mes-devoirs" class="block px-4 py-2 rounded hover:bg-gray-700">Mes Devoirs</a>
+			</li>
+			<li>
+				<a href="/ajouter-devoir" class="block px-4 py-2 rounded hover:bg-gray-700"
+					>Ajouter Devoir</a
+				>
+			</li>
+			<li><a href="/profil" class="block px-4 py-2 rounded hover:bg-gray-700">Profil</a></li>
+		</ul>
+	</nav>
+
+	<!-- Contenu principal -->
+	<div class="flex-1 ml-64 max-w-7xl mx-auto p-8 mt-6 bg-white">
+		<h1 class="text-3xl font-bold mb-6">Détails du Profil</h1>
+		<p class="text-gray-600 mb-6">
+			Gérez les détails de votre compte qui représentent comment les autres utilisateurs vous
+			voient, en plus d'autres détails utilisés pour la communication et la personnalisation du
+			système.
+		</p>
+		<div class="space-y-4">
+			<div class="flex space-x-4">
+				<div class="flex-1 relative">
+					<label class="block text-gray-700 font-bold">Nom</label>
+					<div class="relative">
+						<input
+							type="text"
+							value={utilisateur.nom}
+							class="w-full p-2 border border-gray-300 rounded bg-gray-100 cursor-default"
+							readonly
+						/>
+						<div class="absolute inset-0 diagonal-stripes pointer-events-none"></div>
+					</div>
+				</div>
+				<div class="flex-1 relative">
+					<label class="block text-gray-700 font-bold">Prénom</label>
+					<div class="relative">
+						<input
+							type="text"
+							value={utilisateur.prenom}
+							class="w-full p-2 border border-gray-300 rounded bg-gray-100 cursor-default"
+							readonly
+						/>
+						<div class="absolute inset-0 diagonal-stripes pointer-events-none"></div>
+					</div>
 				</div>
 			</div>
-			<div class="flex-1 relative">
-				<label class="block text-gray-700 font-bold">Prénom</label>
-				<div class="relative">
-					<input
-						type="text"
-						value={utilisateur.prenom}
-						class="w-full p-2 border border-gray-300 rounded bg-gray-100 cursor-default"
-						readonly
-					/>
-					<div class="absolute inset-0 diagonal-stripes pointer-events-none"></div>
-				</div>
-			</div>
-		</div>
-		<hr class="my-4 border-gray-300" />
-		<div>
-			<label class="block text-gray-700 font-bold">Promotion</label>
-			<select bind:value={utilisateur.promotion} class="w-full p-2 border border-gray-300 rounded">
-				{#each Object.values(EPromotion) as promotion}
-					<option value={promotion}>{promotion}</option>
-				{/each}
-			</select>
-		</div>
-		<hr class="my-4 border-gray-300" />
-		<div class="flex space-x-4">
-			<div class="flex-1">
-				<label class="block text-gray-700 font-bold">Groupe TD</label>
+			<hr class="my-4 border-gray-300" />
+			<div>
+				<label class="block text-gray-700 font-bold">Promotion</label>
 				<select
-					onchange={() => {
-						utilisateur.groupeTP = FILTERED_GROUPES_TP[0];
-					}}
-					bind:value={utilisateur.groupeTD}
+					bind:value={utilisateur.promotion}
 					class="w-full p-2 border border-gray-300 rounded"
 				>
-					{#each groupesTD as groupe}
-						<option selected={utilisateur.groupeTD === groupe} value={groupe}>
-							{groupe}
-						</option>
+					{#each Object.values(EPromotion) as promotion}
+						<option value={promotion}>{promotion}</option>
 					{/each}
 				</select>
 			</div>
-			<div class="flex-1">
-				<label class="block text-gray-700 font-bold">Groupe TP</label>
-				<select bind:value={utilisateur.groupeTP} class="w-full p-2 border border-gray-300 rounded">
-					{#each FILTERED_GROUPES_TP as groupe}
-						<option selected={utilisateur?.groupeTP === groupe} value={groupe}>
-							{groupe}
-						</option>
-					{/each}
-				</select>
+			<hr class="my-4 border-gray-300" />
+			<div class="flex space-x-4">
+				<div class="flex-1">
+					<label class="block text-gray-700 font-bold">Groupe TD</label>
+					<select
+						onchange={() => {
+							utilisateur.groupeTP = FILTERED_GROUPES_TP[0];
+						}}
+						bind:value={utilisateur.groupeTD}
+						class="w-full p-2 border border-gray-300 rounded"
+					>
+						{#each groupesTD as groupe}
+							<option selected={utilisateur.groupeTD === groupe} value={groupe}>
+								{groupe}
+							</option>
+						{/each}
+					</select>
+				</div>
+				<div class="flex-1">
+					<label class="block text-gray-700 font-bold">Groupe TP</label>
+					<select
+						bind:value={utilisateur.groupeTP}
+						class="w-full p-2 border border-gray-300 rounded"
+					>
+						{#each FILTERED_GROUPES_TP as groupe}
+							<option selected={utilisateur?.groupeTP === groupe} value={groupe}>
+								{groupe}
+							</option>
+						{/each}
+					</select>
+				</div>
 			</div>
-		</div>
-		<hr class="my-4 border-gray-300" />
-		<div class="relative">
-			<label class="block text-gray-700 font-bold">E-mail</label>
+			<hr class="my-4 border-gray-300" />
 			<div class="relative">
-				<input
-					type="email"
-					value={utilisateur.email}
-					class="w-full p-2 border border-gray-300 rounded bg-gray-100 cursor-default"
-					readonly
-				/>
-				<div class="absolute inset-0 diagonal-stripes pointer-events-none"></div>
+				<label class="block text-gray-700 font-bold">E-mail</label>
+				<div class="relative">
+					<input
+						type="email"
+						value={utilisateur.email}
+						class="w-full p-2 border border-gray-300 rounded bg-gray-100 cursor-default"
+						readonly
+					/>
+					<div class="absolute inset-0 diagonal-stripes pointer-events-none"></div>
+				</div>
 			</div>
-		</div>
 
-		<hr class="my-4 border-gray-300" />
-		<div class="flex justify-end space-x-4">
-			<button onclick={handleSave} class="px-4 py-2 bg-[#CAC3D6] text-[#3B2A5B] rounded"
-				>Enregistrer</button
-			>
+			<hr class="my-4 border-gray-300" />
+			<div class="flex justify-end space-x-4">
+				<button onclick={handleSave} class="px-4 py-2 bg-[#CAC3D6] text-[#3B2A5B] rounded"
+					>Enregistrer</button
+				>
+			</div>
 		</div>
 	</div>
 </div>

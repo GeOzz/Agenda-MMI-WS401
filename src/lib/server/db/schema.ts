@@ -5,7 +5,7 @@ export const utilisateurs = sqliteTable('utilisateurs', {
 	nom: text('nom'),
 	prenom: text('prenom'),
 	email: text('email'),
-	role: text('role'),
+	role: text('role').notNull().default('Etudiant'), // Ajoutez une valeur par défaut pour le rôle
 	mot_de_passe: text('mot_de_passe'),
 	promotion: text('promotion'),
 	groupeTD: text('groupeTD'),

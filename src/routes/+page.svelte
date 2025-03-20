@@ -51,7 +51,7 @@
 	}
 
 	function handleAFaire(devoir_id: number) {
-		const index = DEVOIRS.findIndex(d => d.id === devoir_id);
+		const index = DEVOIRS.findIndex((d) => d.id === devoir_id);
 		if (index !== -1) {
 			DEVOIRS[index].status = 'a_faire';
 			DEVOIRS.sort((a, b) => (a.status === 'a_faire' ? -1 : 1));
@@ -59,7 +59,7 @@
 	}
 
 	function handleDejaFait(devoir_id: number) {
-		const index = DEVOIRS.findIndex(d => d.id === devoir_id);
+		const index = DEVOIRS.findIndex((d) => d.id === devoir_id);
 		if (index !== -1) {
 			DEVOIRS[index].status = 'deja_fait';
 			DEVOIRS.sort((a, b) => (a.status === 'deja_fait' ? 1 : -1));
@@ -69,51 +69,93 @@
 
 {#await AfficherOuNon then value}
 	{#if STORE.connected === true}
-		<div class="max-w-7xl mx-auto p-6">
-			<h1 class="text-4xl font-bold mb-6">
-				Bienvenue {STORE.utilisateur?.nom}, vous avez {DEVOIRS.length} devoirs à rendre.
-			</h1>
+		<div class="flex">
+			<!-- Menu de navigation à gauche -->
+			<nav
+				class="w-64 h-screen bg-gray-100 text-black flex flex-col fixed top-0 left-0 overflow-y-auto"
+			>
+				<div class="p-4">
+					<h2 class="text-2xl font-bold">Menu</h2>
+				</div>
+				<ul class="flex-1 p-4 space-y-2">
+					<li><a href="/" class="block px-4 py-2 rounded hover:bg-gray-700">Accueil</a></li>
+					<li>
+						<a href="/mes-devoirs" class="block px-4 py-2 rounded hover:bg-gray-700">Mes Devoirs</a>
+					</li>
+					<li>
+						<a href="/ajouter-devoir" class="block px-4 py-2 rounded hover:bg-gray-700"
+							>Ajouter Devoir</a
+						>
+					</li>
+					<li><a href="/profil" class="block px-4 py-2 rounded hover:bg-gray-700">Profil</a></li>
+				</ul>
+			</nav>
 
-			<div class="space-y-4 mb-8">
-				{#each DEVOIRS as devoir}
-					<div class="bg-white shadow-md rounded-lg p-6 border border-gray-300 flex justify-between items-center {devoir.status === 'deja_fait' ? 'opacity-50' : ''}">
-						<div class="flex items-center">
-							<div class="w-12 h-12 rounded-full bg-[#4D3677] flex items-center justify-center text-white font-bold">
-								{devoir.matiere.slice(0, 2).toUpperCase()}
+			<!-- Contenu principal -->
+			<div class="flex-1 ml-64 max-w-7xl mx-auto p-8 mt-6 bg-white">
+				<h1 class="text-4xl font-bold mb-10">
+					Bienvenue {STORE.utilisateur?.nom}, vous avez {DEVOIRS.length} devoirs à rendre.
+				</h1>
+
+				<div class="space-y-4 mb-8">
+					{#each DEVOIRS as devoir}
+						<div
+							class="bg-white shadow-md rounded-lg p-8 border-t border-b border-gray-300 flex justify-between items-center {devoir.status ===
+							'deja_fait'
+								? 'opacity-50'
+								: ''}"
+						>
+							<div class="flex items-center">
+								<div
+									class="w-12 h-12 rounded-full bg-[#4D3677] flex items-center justify-center text-white font-bold"
+								>
+									{devoir.matiere.slice(0, 2).toUpperCase()}
+								</div>
+								<div class="ml-4">
+									<h2 class="text-xl font-semibold">{devoir.matiere} - {devoir.titre}</h2>
+									<p class="text-gray-500">
+										Ajouté par Étudiant le {new Date(devoir.timestamp).toLocaleDateString('fr-FR')} à
+										{new Date(devoir.timestamp).toLocaleTimeString('fr-FR')}
+									</p>
+									<p class="text-gray-500">
+										Rendu prévu pour le {new Date(devoir.expire_le_timestamp).toLocaleDateString(
+											'fr-FR'
+										)} à {new Date(devoir.expire_le_timestamp).toLocaleTimeString('fr-FR')}
+									</p>
+								</div>
 							</div>
-							<div class="ml-4">
-								<h2 class="text-xl font-semibold">{devoir.matiere} - {devoir.titre}</h2>
-								<p class="text-gray-500">Ajouté par Étudiant le {new Date(devoir.timestamp).toLocaleDateString('fr-FR')} à {new Date(devoir.timestamp).toLocaleTimeString('fr-FR')}</p>
-								<p class="text-gray-500">Rendu prévu pour le {new Date(devoir.expire_le_timestamp).toLocaleDateString('fr-FR')} à {new Date(devoir.expire_le_timestamp).toLocaleTimeString('fr-FR')}</p>
-							</div>
-						</div>
-						<div class="border-l border-gray-300 h-full mx-4"></div>
-						<div class="flex-1">
-							<p class="text-sm text-gray-800">{devoir.description}</p>
-							<div class="flex justify-between items-center mt-2">
-								<button on:click={() => handleVoirPlus(devoir.id)} class="px-4 py-2 bg-[#9385AB] bg-opacity-90 text-[#3B2A5B] font-bold rounded-md hover:bg-opacity-100">Voir plus</button>
-								<div class="flex space-x-2">
-									<button on:click={() => handleAFaire(devoir.id)} class="px-4 py-2 bg-[#F7B000] text-[#3B2A5B] font-bold rounded-md hover:bg-[#D69A00]">À faire</button>
-									<button on:click={() => handleDejaFait(devoir.id)} class="px-4 py-2 bg-[#DDD4EC] text-[#3B2A5B] font-bold rounded-md">Déjà fait</button>
+							<div class="border-l border-gray-300 h-full mx-4"></div>
+							<div class="flex-1">
+								<div class="flex justify-between items-center mt-2">
+									<button
+										on:click={() => handleVoirPlus(devoir.id)}
+										class="px-4 py-2 bg-[#9385AB] bg-opacity-90 text-[#3B2A5B] font-bold rounded-md hover:bg-opacity-100"
+										>Voir plus</button
+									>
+									<div class="flex space-x-2">
+										<button
+											on:click={() => handleAFaire(devoir.id)}
+											class="px-4 py-2 bg-[#F7B000] text-[#3B2A5B] font-bold rounded-md hover:bg-[#D69A00]"
+											>À faire</button
+										>
+										<button
+											on:click={() => handleDejaFait(devoir.id)}
+											class="px-4 py-2 bg-[#DDD4EC] text-[#3B2A5B] font-bold rounded-md"
+											>Déjà fait</button
+										>
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-				{/each}
-			</div>
-
-			<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-				{#each semesters as semester}
-					<div class="bg-white shadow-md rounded-lg overflow-hidden border border-gray-300">
-						<img src="/fond-devoirs.jpeg" alt="Semestre" class="w-full h-40 object-cover" />
-						<div class="p-4">
-							<h3 class="text-xl font-semibold mb-2">{semester.title}</h3>
-							<p class="text-gray-500 mb-2">{semester.subtitle}</p>
-							<p class="text-gray-400 text-sm"></p>
-						</div>
-					</div>
-				{/each}
+					{/each}
+				</div>
 			</div>
 		</div>
 	{/if}
 {/await}
+
+<style>
+	:global(body) {
+		@apply bg-gray-100;
+	}
+</style>
