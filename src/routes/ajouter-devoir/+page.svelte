@@ -7,6 +7,7 @@
 	import { Editor } from '@tiptap/core';
 	import { onMount } from 'svelte';
 	import { Markdown } from 'tiptap-markdown';
+	import { goto } from '$app/navigation';
 	const matieres_options = Object.values(MATIERES);
 	let promotion = $state('1ère Année (BUT1)');
 	let selectedMatiere = $state(matieres_options[0].id);
@@ -68,18 +69,21 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 	async function handleSubmit(event: Event) {
 		event.preventDefault();
 		markdown = editor ? editor.storage.markdown.getMarkdown() : '';
-		console.log(
+		console.log('Données à envoyer:', {
 			promotion,
 			selectedMatiere,
 			expire_le_timestamp,
-			groupes.join(','),
+			groupes,
 			markdown,
 			titre
-		);
+		});
 		try {
 			console.log(new Date(expire_le_timestamp).getTime());
 			const RESPONSE = await fetch('/api/devoirs', {
 				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
 				body: JSON.stringify({
 					promotion,
 					matiere: selectedMatiere,
@@ -557,6 +561,7 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 			<button
 				type="button"
 				class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+				onclick={() => goto('/')}
 			>
 				Retour
 			</button>

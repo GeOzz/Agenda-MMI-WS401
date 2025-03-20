@@ -60,7 +60,7 @@
 							popover="auto"
 							class="right-0 mt-2 w-full md:w-48 bg-white shadow-lg py-1 text-gray-700 rounded-sm z-50"
 						>
-							<a href="/profile" class="block px-4 py-3 hover:bg-gray-100">Mon Profil</a>
+							<a href="/menu-profil" class="block px-4 py-3 hover:bg-gray-100">Mon Profil</a>
 							<hr class="my-1" />
 							<button
 								onclick={() => deconnexion()}

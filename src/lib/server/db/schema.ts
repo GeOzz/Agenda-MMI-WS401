@@ -27,7 +27,8 @@ export const devoirs = sqliteTable('devoirs', {
 	utilisateur_id_createur: integer('utilisateur_id_createur').references(() => utilisateurs.id),
 	expire_le_timestamp: integer('expire_le_timestamp'),
 	groupes: text('groupes'),
-	timestamp: integer('timestamp')
+	timestamp: integer('timestamp'),
+	titre: text('titre').notNull()
 });
 
 export const votes_devoir = sqliteTable('votes_devoir', {
