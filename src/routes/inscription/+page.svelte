@@ -4,7 +4,7 @@
 	let erreur = $state('');
 	async function handleSubmit(FORMULAIRE: IUtilisateur) {
 		try {
-			const REPONSE = await fetch('/inscription', {
+			const REPONSE = await fetch('/api/inscription', {
 				method: 'POST',
 				body: JSON.stringify(FORMULAIRE)
 			});

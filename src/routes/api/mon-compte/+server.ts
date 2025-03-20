@@ -24,3 +24,34 @@ export const GET: RequestHandler = async ({ request }) => {
 	const { mot_de_passe, ...UTILISATEUR_SANS_MOT_DE_PASSE } = UTILISATEUR;
 	return new Response(JSON.stringify(UTILISATEUR_SANS_MOT_DE_PASSE));
 };
+
+export const POST: RequestHandler = async ({ request }) => {
+	const UTILISATEUR_BODY = await request.json();
+	const COOKIE = request.headers.get('Cookie');
+	if (!COOKIE) {
+		return new Response('Session invalide', { status: 401 });
+	}
+	const SESSION = COOKIE.split('; ')
+		.find((row) => row.startsWith('session='))
+		?.split('=')[1];
+	const SESSION_VALIDE = await checkSessionValide(SESSION!);
+	if (!SESSION_VALIDE) {
+		return new Response('Session invalide', { status: 401 });
+	}
+	const UTILISATEUR = await db.query.utilisateurs.findFirst({
+		where: eq(utilisateurs.id, SESSION_VALIDE.id_utilisateur)
+	});
+	if (!UTILISATEUR) {
+		return new Response('Utilisateur non trouvé', { status: 404 });
+	}
+
+	await db
+		.update(utilisateurs)
+		.set({
+			promotion: UTILISATEUR_BODY.promotion,
+			groupeTD: UTILISATEUR_BODY.groupeTD,
+			groupeTP: UTILISATEUR_BODY.groupeTP
+		})
+		.where(eq(utilisateurs.id, UTILISATEUR.id));
+	return new Response('Profil mis à jour avec succès', { status: 200 });
+};

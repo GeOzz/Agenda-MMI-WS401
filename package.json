@@ -45,6 +45,7 @@
 		"bcrypt": "^5.1.1",
 		"better-sqlite3": "^11.8.0",
 		"drizzle-orm": "^0.40.1",
+		"svelte-markdown": "^0.4.1",
 		"tiptap": "^1.32.2",
 		"tiptap-markdown": "^0.8.10"
 	}

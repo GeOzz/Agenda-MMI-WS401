@@ -32,7 +32,10 @@ export const GET: RequestHandler = async ({ request }) => {
 		const TOUS_LES_DEVOIRS =
 			UTILISATEUR?.role === ERoleUtilisateur.PROFESSEUR ||
 			UTILISATEUR?.role === ERoleUtilisateur.DELEGUEE;
-
+		const DEVOIR_EXPIRE = devoir.expire_le_timestamp! < new Date().getTime();
+		if (DEVOIR_EXPIRE) {
+			return undefined;
+		}
 		if (TOUS_LES_DEVOIRS) {
 			return devoir;
 		}
@@ -57,7 +60,8 @@ export const POST: RequestHandler = async ({ request }) => {
 		return new Response('Session invalide', { status: 401 });
 	}
 
-	const { promotion, matiere, expire_le_timestamp, groupes, markdown } = await request.json();
+	const { promotion, matiere, expire_le_timestamp, groupes, markdown, titre } =
+		await request.json();
 
 	await db.insert(devoirs).values({
 		promotion,
@@ -66,6 +70,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		groupes,
 		markdown,
 		utilisateur_id_createur: SESSION_VALIDE.id_utilisateur,
+		titre,
 		timestamp: new Date().getTime()
 	});
 	return new Response(JSON.stringify({ message: 'Devoir ajouté avec succès' }));

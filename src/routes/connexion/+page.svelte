@@ -7,7 +7,7 @@
 
 	async function handleSubmit(FORMULAIRE: { email: string; mot_de_passe: string }) {
 		try {
-			const REPONSE = await fetch('/connexion', {
+			const REPONSE = await fetch('/api/connexion', {
 				method: 'POST',
 				body: JSON.stringify(FORMULAIRE)
 			});

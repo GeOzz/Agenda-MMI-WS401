@@ -3,37 +3,12 @@
 	import { EPromotion } from '$lib/interfaces/IUtilisateur';
 	import { checkConnected, redirectToConnexion, STORE } from '$lib/store.svelte';
 	import { onMount } from 'svelte';
-
-	let devoirs = [
-		{
-			id: 1,
-			titre: 'Ergonomie et Accessibilité',
-			matiere: 'WR203',
-			date: '26/03/2025',
-			heure: '20h',
-			description:
-				'Réaliser une maquette responsive d’un site déjà existant en utilisant les principes d’ergonomie et d’accessibilité vus en cours.',
-			rendu: 'Professeur'
-		},
-		{
-			id: 2,
-			titre: 'Anglais',
-			matiere: 'WR207',
-			date: '26/03/2025',
-			heure: '14h',
-			description: 'Réaliser une présentation en anglais sur le sujet de votre choix.',
-			rendu: 'Professeur'
-		},
-		{
-			id: 3,
-			titre: 'Anglais Renforcé',
-			matiere: 'WR202',
-			date: '26/03/2025',
-			heure: '10h',
-			description: 'Réaliser une présentation en anglais sur le sujet de votre choix.',
-			rendu: 'Professeur'
-		}
-	];
+	let DEVOIRS = [];
+	onMount(async () => {
+		const response = await fetch('/api/devoirs');
+		const devoirs = await response.json();
+		DEVOIRS = devoirs;
+	});
 
 	const semesters = [
 		{
@@ -61,29 +36,44 @@
 			resolve(true);
 		}
 	});
+
+	function getTimeRemaining(expire_le_timestamp: number) {
+		const total = expire_le_timestamp - Date.now();
+		const days = Math.floor(total / (1000 * 60 * 60 * 24));
+		const hours = Math.floor((total / (1000 * 60 * 60)) % 24);
+		const minutes = Math.floor((total / (1000 * 60)) % 60);
+		const seconds = Math.floor((total / 1000) % 60);
+		return { total, days, hours, minutes, seconds };
+	}
 </script>
 
 {#await AfficherOuNon then value}
 	{#if STORE.connected === true}
 		<div class="max-w-7xl mx-auto p-6">
 			<h1 class="text-4xl font-bold mb-6">
-				Bienvenue ETUDIANT, vous avez {devoirs.length} devoirs à rendre.
+				Bienvenue ETUDIANT, vous avez {DEVOIRS.length} devoirs à rendre.
 			</h1>
 
 			<div class="space-y-4 mb-8">
-				{#each devoirs as devoir}
+				{#each DEVOIRS as devoir}
 					<div class="bg-white shadow-md rounded-lg p-6 border border-gray-300">
 						<div class="flex justify-between items-center mb-4">
 							<div>
 								<h2 class="text-xl font-semibold">{devoir.matiere} - {devoir.titre}</h2>
-								<p class="text-gray-500">Rendu prévu pour le {devoir.date} à {devoir.heure}</p>
+								<p class="text-gray-500">
+									Rendu prévu pour le {new Date(devoir.expire_le_timestamp).toLocaleDateString(
+										'fr-FR'
+									)}
+									à {new Date(devoir.expire_le_timestamp).toLocaleTimeString('fr-FR')}
+								</p>
 							</div>
 							<div class="flex space-x-2">
 								<button class="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600"
 									>À faire</button
 								>
-								<button class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600"
-									>Voir</button
+								<a
+									href={`/devoir/${devoir.id}`}
+									class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600">Voir</a
 								>
 							</div>
 						</div>
@@ -99,9 +89,7 @@
 						<div class="p-4">
 							<h3 class="text-xl font-semibold mb-2">{semester.title}</h3>
 							<p class="text-gray-500 mb-2">{semester.subtitle}</p>
-							<p class="text-gray-400 text-sm">
-								Dernière modification effectuée le {semester.lastUpdate} par {semester.updatedBy}
-							</p>
+							<p class="text-gray-400 text-sm"></p>
 						</div>
 					</div>
 				{/each}

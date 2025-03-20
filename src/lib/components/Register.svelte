@@ -11,8 +11,20 @@
 	let groupeTD = $state(EGroupeTD.TD_AB);
 	let groupeTP = $state(EGroupeTP.TP_A);
 
+	const FILTERED_GROUPES_TP = $derived.by(() => {
+		if (!groupeTD) return Object.values(EGroupeTP);
+
+		const tdLetters = groupeTD.replace('TD ', '').split('');
+
+		return Object.values(EGroupeTP).filter((tp) => {
+			const tpLetter = tp.replace('TP ', '');
+			return tdLetters.includes(tpLetter);
+		});
+	});
+
 	let { OnSubmit } = $props();
-	function handleSubmit() {
+	function handleSubmit(event: Event) {
+		event.preventDefault();
 		OnSubmit({ nom, prenom, email, mot_de_passe, promotion, groupeTD, groupeTP });
 	}
 
@@ -61,7 +73,7 @@
 	<div class="bg-white rounded-lg shadow-lg p-8 w-full">
 		<h2 class="text-3xl font-bold mb-8">S'inscrire</h2>
 
-		<form class="space-y-6" on:submit|preventDefault={handleSubmit}>
+		<form class="space-y-6" onsubmit={handleSubmit}>
 			<!-- Nom et Prénom -->
 			<div class="grid grid-cols-2 gap-4">
 				<div>
@@ -151,11 +163,16 @@
 					<select
 						required
 						id="groupeTD"
+						onchange={() => {
+							groupeTP = FILTERED_GROUPES_TP[0];
+						}}
 						bind:value={groupeTD}
 						class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white"
 					>
-						{#each Object.values(EGroupeTD) as groupeTD}
-							<option>{groupeTD}</option>
+						{#each Object.values(EGroupeTD) as _groupeTD}
+							<option value={_groupeTD} selected={_groupeTD === groupeTD}>
+								{_groupeTD}
+							</option>
 						{/each}
 					</select>
 				</div>
@@ -167,8 +184,10 @@
 						bind:value={groupeTP}
 						class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white"
 					>
-						{#each Object.values(EGroupeTP) as groupeTP}
-							<option>{groupeTP}</option>
+						{#each FILTERED_GROUPES_TP as _groupeTP}
+							<option value={_groupeTP} selected={_groupeTP === groupeTP}>
+								{_groupeTP}
+							</option>
 						{/each}
 					</select>
 				</div>

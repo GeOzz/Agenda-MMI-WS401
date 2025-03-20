@@ -1,5 +1,11 @@
 // uno.config.ts
-import { defineConfig, presetUno, presetMini, transformerDirectives } from 'unocss';
+import {
+	defineConfig,
+	presetUno,
+	presetMini,
+	transformerDirectives,
+	presetTypography
+} from 'unocss';
 import presetIcons from '@unocss/preset-icons';
 
 import transformerVariantGroup from '@unocss/transformer-variant-group';
@@ -13,7 +19,8 @@ export default defineConfig({
 		presetMini({
 			dark: 'media'
 		}),
-		presetForms()
+		presetForms(),
+		presetTypography()
 		// ...other presets
 	]
 });

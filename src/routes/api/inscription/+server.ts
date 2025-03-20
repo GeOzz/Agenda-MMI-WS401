@@ -3,6 +3,7 @@ import { utilisateurs } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import bcrypt from 'bcrypt';
+import { ERoleUtilisateur } from '$lib/interfaces/IUtilisateur';
 export const POST: RequestHandler = async ({ request }) => {
 	const UTILISATEUR = await request.json();
 
@@ -20,6 +21,7 @@ export const POST: RequestHandler = async ({ request }) => {
 			nom: UTILISATEUR.nom,
 			prenom: UTILISATEUR.prenom,
 			email: UTILISATEUR.email,
+			role: ERoleUtilisateur.ETUDIANT,
 			mot_de_passe: bcrypt.hashSync(UTILISATEUR.mot_de_passe, 10),
 			promotion: UTILISATEUR.promotion,
 			groupeTD: UTILISATEUR.groupeTD,

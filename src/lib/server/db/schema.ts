@@ -13,9 +13,9 @@ export const utilisateurs = sqliteTable('utilisateurs', {
 });
 
 export const sessions = sqliteTable('sessions', {
-	id: integer('id'),
+	id: integer('id').primaryKey(),
 	id_utilisateur: integer('id_utilisateur').references(() => utilisateurs.id),
-	id_session: text('id_session').primaryKey(),
+	id_session: text('id_session').notNull(),
 	expire_le_timestamp: integer('expire_le_timestamp')
 });
 
