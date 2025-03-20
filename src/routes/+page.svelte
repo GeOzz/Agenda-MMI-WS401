@@ -107,16 +107,16 @@
 						>
 							<div class="flex items-center">
 								<div
-									class="w-12 h-12 rounded-full bg-[#4D3677] flex items-center justify-center text-white font-bold"
+									class="w-16 h-16 rounded-full bg-[#4D3677] flex items-center justify-center text-white font-bold"
 								>
 									{devoir.matiere.slice(0, 2).toUpperCase()}
 								</div>
 								<div class="ml-4">
-									<h2 class="text-xl font-semibold">{devoir.matiere} - {devoir.titre}</h2>
-									<p class="text-gray-500">
+									<h2 class="text-3xl font-semibold mb-2">{devoir.matiere} - {devoir.titre}</h2>
+									<p class="text-gray-500 text-sm">
 										Ajouté par <span class="font-bold">{STORE.utilisateur?.nom} {STORE.utilisateur?.prenom}</span> le <span class="font-bold">{new Date(devoir.timestamp).toLocaleDateString('fr-FR')}</span> à <span class="font-bold">{new Date(devoir.timestamp).toLocaleTimeString('fr-FR')}</span>
 									</p>
-									<p class="text-gray-500">
+									<p class="text-gray-500 text-lg mt-4">
 										Rendu prévu pour le <span class="font-bold">{new Date(devoir.expire_le_timestamp).toLocaleDateString(
 											'fr-FR'
 										)}</span> à <span class="font-bold">{new Date(devoir.expire_le_timestamp).toLocaleTimeString('fr-FR')}</span>
