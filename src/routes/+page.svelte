@@ -78,16 +78,16 @@
 					<h2 class="text-2xl font-bold">Menu</h2>
 				</div>
 				<ul class="flex-1 p-4 space-y-2">
-					<li><a href="/" class="block px-4 py-2 rounded hover:bg-gray-700">Accueil</a></li>
+					<li><a href="/" class="block px-4 py-2 rounded hover:bg-gray-300 hover:bg-opacity-85">Accueil</a></li>
 					<li>
-						<a href="/mes-devoirs" class="block px-4 py-2 rounded hover:bg-gray-700">Mes Devoirs</a>
+						<a href="/mes-devoirs" class="block px-4 py-2 rounded hover:bg-gray-300 hover:bg-opacity-85">Mes Devoirs</a>
 					</li>
 					<li>
-						<a href="/ajouter-devoir" class="block px-4 py-2 rounded hover:bg-gray-700"
+						<a href="/ajouter-devoir" class="block px-4 py-2 rounded hover:bg-gray-300 hover:bg-opacity-85"
 							>Ajouter Devoir</a
 						>
 					</li>
-					<li><a href="/profil" class="block px-4 py-2 rounded hover:bg-gray-700">Profil</a></li>
+					<li><a href="/profil" class="block px-4 py-2 rounded hover:bg-gray-300 hover:bg-opacity-85">Profil</a></li>
 				</ul>
 			</nav>
 
@@ -114,13 +114,12 @@
 								<div class="ml-4">
 									<h2 class="text-xl font-semibold">{devoir.matiere} - {devoir.titre}</h2>
 									<p class="text-gray-500">
-										Ajouté par Étudiant le {new Date(devoir.timestamp).toLocaleDateString('fr-FR')} à
-										{new Date(devoir.timestamp).toLocaleTimeString('fr-FR')}
+										Ajouté par <span class="font-bold">{STORE.utilisateur?.nom} {STORE.utilisateur?.prenom}</span> le <span class="font-bold">{new Date(devoir.timestamp).toLocaleDateString('fr-FR')}</span> à <span class="font-bold">{new Date(devoir.timestamp).toLocaleTimeString('fr-FR')}</span>
 									</p>
 									<p class="text-gray-500">
-										Rendu prévu pour le {new Date(devoir.expire_le_timestamp).toLocaleDateString(
+										Rendu prévu pour le <span class="font-bold">{new Date(devoir.expire_le_timestamp).toLocaleDateString(
 											'fr-FR'
-										)} à {new Date(devoir.expire_le_timestamp).toLocaleTimeString('fr-FR')}
+										)}</span> à <span class="font-bold">{new Date(devoir.expire_le_timestamp).toLocaleTimeString('fr-FR')}</span>
 									</p>
 								</div>
 							</div>
