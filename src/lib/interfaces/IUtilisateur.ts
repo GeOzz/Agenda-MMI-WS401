@@ -155,9 +155,9 @@ export enum EGroupeTP {
 }
 
 export enum ERoleUtilisateur {
-	Etudiant = 'Etudiant',
-	Delegue = 'Délégué',
-	Professeur = 'Professeur'
+	ETUDIANT = 'ETUDIANT',
+	DELEGUE = 'DELEGUE',
+	PROFESSEUR = 'PROFESSEUR'
 }
 
 export enum EPermissions {
@@ -179,6 +179,6 @@ export const PermissionParRole = {
 		EPermissions.ACCEPTE_DEVOIR,
 		EPermissions.REJETE_DEVOIR
 	],
-	[ERoleUtilisateur.DELEGUEE]: [],
+	[ERoleUtilisateur.DELEGUE]: [],
 	[ERoleUtilisateur.ETUDIANT]: []
 };

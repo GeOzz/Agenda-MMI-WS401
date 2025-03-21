@@ -116,6 +116,18 @@
 						<div class="absolute inset-0 diagonal-stripes pointer-events-none"></div>
 					</div>
 				</div>
+				<div class="flex-1 relative">
+					<label class="block text-gray-700 font-bold">Role</label>
+					<div class="relative">
+						<input
+							type="text"
+							value={utilisateur.role}
+							class="w-full p-2 border border-gray-300 rounded bg-gray-100 cursor-default"
+							readonly
+						/>
+						<div class="absolute inset-0 diagonal-stripes pointer-events-none"></div>
+					</div>
+				</div>
 			</div>
 			<hr class="my-4 border-gray-300" />
 			<div>

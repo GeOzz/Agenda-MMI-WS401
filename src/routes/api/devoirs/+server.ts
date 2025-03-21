@@ -27,21 +27,25 @@ export const GET: RequestHandler = async ({ request }) => {
 
 	const DEVOIRS_AVEC_UTILISATEUR = DEVOIRS.filter((devoir) => {
 		const GROUPES = devoir.groupes?.split(',').map((groupe) => groupe.trim());
+
 		const DEVOIR_DANS_MES_GROUPES =
 			GROUPES?.includes(UTILISATEUR?.groupeTD!) || GROUPES?.includes(UTILISATEUR?.groupeTP!);
-		const TOUS_LES_DEVOIRS =
+		const PROMOTION_INCLUE = UTILISATEUR?.promotion === devoir.promotion;
+		const ADMIN =
 			UTILISATEUR?.role === ERoleUtilisateur.PROFESSEUR ||
-			UTILISATEUR?.role === ERoleUtilisateur.DELEGUEE;
+			UTILISATEUR?.role === ERoleUtilisateur.DELEGUE;
+
+		const PEUT_CONSULTER = ADMIN || (!ADMIN && DEVOIR_DANS_MES_GROUPES && PROMOTION_INCLUE);
+
 		const DEVOIR_EXPIRE = devoir.expire_le_timestamp! < new Date().getTime();
 		if (DEVOIR_EXPIRE) {
 			return undefined;
 		}
-		if (TOUS_LES_DEVOIRS) {
+
+		if (PEUT_CONSULTER) {
 			return devoir;
 		}
-		if (DEVOIR_DANS_MES_GROUPES) {
-			return devoir;
-		}
+
 		return undefined;
 	});
 	return new Response(JSON.stringify(DEVOIRS_AVEC_UTILISATEUR));
@@ -63,7 +67,7 @@ export const POST: RequestHandler = async ({ request }) => {
 	const { promotion, matiere, expire_le_timestamp, groupes, markdown, titre } =
 		await request.json();
 
-	await db.insert(devoirs).values({
+	const DEVOID_DB = await db.insert(devoirs).values({
 		promotion,
 		matiere,
 		expire_le_timestamp,
@@ -73,5 +77,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		titre,
 		timestamp: new Date().getTime()
 	});
-	return new Response(JSON.stringify({ message: 'Devoir ajouté avec succès' }));
+	return new Response(
+		JSON.stringify({ message: 'Devoir ajouté avec succès', id: DEVOID_DB.lastInsertRowid })
+	);
 };

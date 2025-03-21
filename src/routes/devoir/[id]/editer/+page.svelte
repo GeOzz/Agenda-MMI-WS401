@@ -8,6 +8,8 @@
 	import { onMount } from 'svelte';
 	import { Markdown } from 'tiptap-markdown';
 	import { goto } from '$app/navigation';
+	import { page } from '$app/state';
+
 	const matieres_options = Object.values(MATIERES);
 	let promotion = $state('1ère Année (BUT1)');
 	let selectedMatiere = $state(matieres_options[0].id);
@@ -18,69 +20,80 @@
 
 	let markdown = $state('');
 	let titre = $state('');
+	let devoirId = page.params.id;
+	let isLoading = $state(true);
 
 	let element;
 	let editor = $state<Editor | null>(null);
 
-	onMount(() => {
-		editor = new Editor({
-			element: element,
-			extensions: [
-				Color.configure({ types: [TextStyle.name, ListItem.name] }),
-				TextStyle.configure({ types: [ListItem.name] }),
-				StarterKit,
-				Markdown.configure({
-					html: true, // Allow HTML input/output
-					tightLists: true, // No <p> inside <li> in markdown output
-					tightListClass: 'tight', // Add class to <ul> allowing you to remove <p> margins when tight
-					bulletListMarker: '-', // <li> prefix in markdown output
-					linkify: false, // Create links from "https://..." text
-					breaks: false, // New lines (\n) in markdown input are converted to <br>
-					transformPastedText: false, // Allow to paste markdown text in the editor
-					transformCopiedText: false // Copied text is transformed to markdown
-				})
-			],
-			content: `
-# Titre principal
-
-## Sous-titre
-
-Ceci est un paragraphe avec du texte **en gras** et *en italique*.
-
-### Liste à puces
-- Premier élément
-- Deuxième élément
-- Troisième élément
-
-### Liste numérotée
-1. Premier point
-2. Deuxième point
-3. Troisième point
-
-> Ceci est une citation
-			`,
-			onTransaction: () => {
-				// force re-render so `editor.isActive` works as expected
-				editor = editor;
+	onMount(async () => {
+		// Fetch the devoir data
+		try {
+			const response = await fetch(`/api/devoirs/${devoirId}`);
+			if (!response.ok) {
+				throw new Error('Failed to fetch devoir');
 			}
-		});
+
+			const devoir = await response.json();
+
+			// Populate form with existing data
+			titre = devoir.titre;
+			promotion = devoir.promotion || '1ère Année (BUT1)';
+			selectedMatiere = devoir.matiere;
+
+			// Convert timestamp to Date object for the datetime-local input
+			if (devoir.expire_le_timestamp) {
+				const date = new Date(Number(devoir.expire_le_timestamp));
+				expire_le_timestamp = date;
+			}
+
+			// Parse groupes from comma-separated string if available
+			if (devoir.groupes) {
+				groupes = devoir.groupes.split(',');
+			}
+
+			// Initialize editor with existing content
+			markdown = devoir.markdown || '';
+
+			editor = new Editor({
+				element: element,
+				extensions: [
+					Color.configure({ types: [TextStyle.name, ListItem.name] }),
+					TextStyle.configure({ types: [ListItem.name] }),
+					StarterKit,
+					Markdown.configure({
+						html: true, // Allow HTML input/output
+						tightLists: true, // No <p> inside <li> in markdown output
+						tightListClass: 'tight', // Add class to <ul> allowing you to remove <p> margins when tight
+						bulletListMarker: '-', // <li> prefix in markdown output
+						linkify: false, // Create links from "https://..." text
+						breaks: false, // New lines (\n) in markdown input are converted to <br>
+						transformPastedText: false, // Allow to paste markdown text in the editor
+						transformCopiedText: false // Copied text is transformed to markdown
+					})
+				],
+				content: markdown,
+				onTransaction: () => {
+					// force re-render so `editor.isActive` works as expected
+					editor = editor;
+				}
+			});
+
+			isLoading = false;
+		} catch (error) {
+			console.error('Error fetching devoir:', error);
+			alert('Erreur lors du chargement du devoir');
+			goto('/mes-devoirs');
+		}
 	});
 
 	async function handleSubmit(event: Event) {
 		event.preventDefault();
 		markdown = editor ? editor.storage.markdown.getMarkdown() : '';
-		console.log('Données à envoyer:', {
-			promotion,
-			selectedMatiere,
-			expire_le_timestamp,
-			groupes,
-			markdown,
-			titre
-		});
+
 		try {
-			console.log(new Date(expire_le_timestamp).getTime());
-			const RESPONSE = await fetch('/api/devoirs', {
-				method: 'POST',
+			const RESPONSE = await fetch(`/api/devoirs/${devoirId}`, {
+				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json'
 				},
@@ -93,19 +106,22 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 					titre
 				})
 			});
-			const data = await RESPONSE.json();
-			console.log(data);
-			goto('/devoir/' + data.id);
+
+			if (!RESPONSE.ok) {
+				throw new Error('Failed to update devoir');
+			}
+
+			// Redirect to the devoir page
+			goto(`/devoir/${devoirId}`);
 		} catch (error) {
-			console.error(error);
+			console.error('Error updating devoir:', error);
+			alert('Erreur lors de la mise à jour du devoir');
 		}
 	}
 </script>
 
 <div class="max-w-4xl mx-auto p-6 prose">
-	<h1 class="text-3xl font-bold mb-6">Formulaire d'ajouts</h1>
-
-	<h2 class="text-2xl mb-6">Rendu(s) / Exercice(s)</h2>
+	<h1 class="text-3xl font-bold mb-6">Modifier le devoir</h1>
 
 	<form onsubmit={handleSubmit} class="space-y-6">
 		<div class="grid grid-cols-2 gap-6">
@@ -567,15 +583,15 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 			<button
 				type="button"
 				class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
-				onclick={() => goto('/')}
+				onclick={() => goto(`/devoir/${devoirId}`)}
 			>
-				Retour
+				Annuler
 			</button>
 			<button
 				type="submit"
 				class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
 			>
-				Ajouter
+				Mettre à jour
 			</button>
 		</div>
 	</form>
