@@ -1,4 +1,4 @@
-	<script lang="ts">
+<script lang="ts">
 		import { deconnexion, STORE } from '$lib/store.svelte';
 	</script>
 
@@ -62,6 +62,10 @@
 						>
 							<a href="/menu-profil" class="block px-4 py-3 hover:bg-gray-100">Mon Profil</a>
 							<hr class="my-1" />
+							{#if STORE.utilisateur?.role === 'PROFESSEUR'}
+								<a href="/menu-admin" class="block px-4 py-3 hover:bg-gray-100">Menu Admin</a>
+								<hr class="my-1" />
+							{/if}
 							<button
 								onclick={() => deconnexion()}
 								class="block w-full text-left px-4 py-3 hover:bg-gray-100 text-red-600"

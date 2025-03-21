@@ -79,24 +79,7 @@
 					<!-- Titre ajouté -->
 				</div>
 				<ul class="flex-1 p-4 space-y-4">
-					<li>
-						<select
-							class="block w-full px-4 py-2 rounded border border-gray-300 bg-white text-black hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150 ease-in-out"
-							on:change={(e) => toggleDarkMode(e.target.value === 'dark')}
-						>
-							<option value="light">☀️ Mode Clair</option>
-							<option value="dark">🌙 Mode Sombre</option>
-						</select>
-					</li>
-					<li>
-						<select
-							class="block w-full px-4 py-2 rounded border border-gray-300 bg-white text-black hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150 ease-in-out"
-							on:change={(e) => switchToLanguage(e.target.value)}
-						>
-							<option value="fr">🇫🇷 Français</option>
-							<option value="en">🇬🇧 English</option>
-						</select>
-					</li>
+
 				</ul>
 				<div class="p-4 mt-auto">
 					<button
@@ -160,7 +143,7 @@
 								<div class="flex justify-between items-center mt-2">
 									<button
 										on:click={() => handleVoirPlus(devoir?.id)}
-										class="px-4 py-2 bg-[#4D3677] bg-opacity-90 text-[#3B2A5B] font-bold rounded-md hover:bg-opacity-100 transition duration-150 ease-in-out"
+										class="px-4 py-2 bg-[#705B97] bg-opacity-60 text-[#3B2A5B] font-bold rounded-md hover:bg-opacity-40 transition duration-150 ease-in-out"
 										>Voir plus</button
 									>
 									<div class="flex space-x-2">

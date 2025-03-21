@@ -74,21 +74,7 @@
 	<nav
 		class="w-64 h-screen bg-gray-100 text-black flex flex-col fixed top-0 left-0 overflow-y-auto"
 	>
-		<div class="p-4">
-			<h2 class="text-2xl font-bold">Menu</h2>
-		</div>
-		<ul class="flex-1 p-4 space-y-2">
-			<li><a href="/" class="block px-4 py-2 rounded hover:bg-gray-300">Accueil</a></li>
-			<li>
-				<a href="/mes-devoirs" class="block px-4 py-2 rounded hover:bg-gray-300">Mes Devoirs</a>
-			</li>
-			<li>
-				<a href="/ajouter-devoir" class="block px-4 py-2 rounded hover:bg-gray-300"
-					>Ajouter Devoir</a
-				>
-			</li>
-			<li><a href="/profil" class="block px-4 py-2 rounded hover:bg-gray-300">Profil</a></li>
-		</ul>
+
 	</nav>
 
 	{#if devoirs.length === 0}
