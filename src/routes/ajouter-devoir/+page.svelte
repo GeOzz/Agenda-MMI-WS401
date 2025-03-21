@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { EGroupeTD, EGroupeTP, MATIERES } from '$lib/interfaces/IUtilisateur';
 	import { Color } from '@tiptap/extension-color';
 	import ListItem from '@tiptap/extension-list-item';
 	import TextStyle from '@tiptap/extension-text-style';
@@ -8,6 +7,8 @@
 	import { onMount } from 'svelte';
 	import { Markdown } from 'tiptap-markdown';
 	import { goto } from '$app/navigation';
+	import { EGroupeTD, EGroupeTP, MATIERES } from '$lib/interfaces/IUtilisateur';
+
 	const matieres_options = Object.values(MATIERES);
 	let promotion = $state('1ère Année (BUT1)');
 	let selectedMatiere = $state(matieres_options[0].id);
@@ -100,6 +101,26 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 			console.error(error);
 		}
 	}
+
+	let MATIERES_FILTRE = $derived.by(() => {
+		if (promotion === '1ère Année (BUT1)') {
+			return matieres_options.filter((matiere) => {
+				const ID = parseInt(String(matiere.id).slice(2, 5));
+				return ID >= 100 && ID <= 200;
+			});
+		} else if (promotion === '2ème Année (BUT2)') {
+			return matieres_options.filter((matiere) => {
+				const ID = parseInt(String(matiere.id).slice(2, 5));
+				return ID >= 200 && ID <= 400;
+			});
+		} else if (promotion === '3ème Année (BUT3)') {
+			return matieres_options.filter((matiere) => {
+				const ID = parseInt(String(matiere.id).slice(2, 5));
+				return ID >= 400 && ID <= 600;
+			});
+		}
+		return matieres_options.filter((matiere) => matiere.id !== '1');
+	});
 </script>
 
 <div class="max-w-4xl mx-auto p-6 prose">
@@ -127,11 +148,21 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 
 				<select
 					required
-					bind:value={selectedMatiere}
+					onchange={(e) => {
+						const value = e.target.value;
+						if (value === '1') {
+							selectedMatiere = MATIERES_FILTRE[0]?.id;
+						} else {
+							selectedMatiere = value;
+						}
+					}}
 					class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
 				>
-					{#each matieres_options as matiere}
-						<option value={matiere.id}>{matiere.nom}</option>
+					{#each MATIERES_FILTRE as matiere}
+						<option
+							selected={selectedMatiere === matiere.id || MATIERES_FILTRE[0]?.id === matiere.id}
+							value={matiere.id}>{matiere.nom}</option
+						>
 					{/each}
 				</select>
 			</div>
