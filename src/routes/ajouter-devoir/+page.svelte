@@ -111,12 +111,12 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 		} else if (promotion === '2ème Année (BUT2)') {
 			return matieres_options.filter((matiere) => {
 				const ID = parseInt(String(matiere.id).slice(2, 5));
-				return ID >= 200 && ID <= 400;
+				return ID >= 300 && ID <= 400;
 			});
 		} else if (promotion === '3ème Année (BUT3)') {
 			return matieres_options.filter((matiere) => {
 				const ID = parseInt(String(matiere.id).slice(2, 5));
-				return ID >= 400 && ID <= 600;
+				return ID >= 500 && ID <= 600;
 			});
 		}
 		return matieres_options.filter((matiere) => matiere.id !== '1');
