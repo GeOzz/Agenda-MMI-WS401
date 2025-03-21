@@ -7,10 +7,11 @@
 	import { onMount } from 'svelte';
 	import { Markdown } from 'tiptap-markdown';
 	import { goto } from '$app/navigation';
-	import { EGroupeTD, EGroupeTP, MATIERES } from '$lib/interfaces/IUtilisateur';
+	import { EGroupeTD, EGroupeTP, EPromotion, MATIERES } from '$lib/interfaces/IUtilisateur';
+	import { STORE } from '$lib/store.svelte';
 
 	const matieres_options = Object.values(MATIERES);
-	let promotion = $state('1ère Année (BUT1)');
+	let promotion = $state(EPromotion.PREMIERE_ANNEE);
 	let selectedMatiere = $state(matieres_options[0].id);
 	let expire_le_timestamp = $state(new Date());
 	let groupes = $state([]);
@@ -79,6 +80,7 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 			titre
 		});
 		try {
+			promotion = MA_PROMOTION;
 			console.log(new Date(expire_le_timestamp).getTime());
 			const RESPONSE = await fetch('/api/devoirs', {
 				method: 'POST',
@@ -101,23 +103,32 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 			console.error(error);
 		}
 	}
+	let MA_PROMOTION = $derived(STORE.utilisateur?.promotion);
 
+	let PROMOTIONS_OPTIONS = $derived.by(() => {
+		const IS_ETUDIANT = STORE.utilisateur?.role === 'ETUDIANT';
+		if (IS_ETUDIANT) {
+			return [MA_PROMOTION];
+		} else {
+			return Object.values(EPromotion);
+		}
+	});
 	let MATIERES_FILTRE = $derived.by(() => {
-		if (promotion === '1ère Année (BUT1)') {
+		if (MA_PROMOTION === EPromotion.PREMIERE_ANNEE) {
 			return matieres_options
 				.filter((matiere) => {
 					const ID = parseInt(String(matiere.id).slice(2, 5));
 					return ID >= 100 && ID <= 300;
 				})
 				.sort((a, b) => parseInt(String(a.id).slice(2, 5)) - parseInt(String(b.id).slice(2, 5)));
-		} else if (promotion === '2ème Année (BUT2)') {
+		} else if (MA_PROMOTION === EPromotion.DEUXIEME_ANNEE) {
 			return matieres_options
 				.filter((matiere) => {
 					const ID = parseInt(String(matiere.id).slice(2, 5));
 					return ID >= 300 && ID <= 500;
 				})
 				.sort((a, b) => parseInt(String(a.id).slice(2, 5)) - parseInt(String(b.id).slice(2, 5)));
-		} else if (promotion === '3ème Année (BUT3)') {
+		} else if (MA_PROMOTION === EPromotion.TROISIEME_ANNEE) {
 			return matieres_options
 				.filter((matiere) => {
 					const ID = parseInt(String(matiere.id).slice(2, 5));
@@ -142,12 +153,17 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 				<label class="block text-sm font-medium text-gray-700 mb-2">Promotion</label>
 				<select
 					required
-					bind:value={promotion}
+					onchange={(e) => {
+						const value = e.target.value;
+						promotion = value;
+					}}
 					class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
 				>
-					<option>1ère Année (BUT1)</option>
-					<option>2ème Année (BUT2)</option>
-					<option>3ème Année (BUT3)</option>
+					{#each PROMOTIONS_OPTIONS as promotion}
+						<option selected={MA_PROMOTION === promotion} value={promotion}>
+							{promotion}
+						</option>
+					{/each}
 				</select>
 			</div>
 
@@ -203,7 +219,6 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 					{groupes.length === groupes_options.length ? 'Effacer' : 'Tous'}
 				</button>
 				<select
-					required
 					bind:value={selectedGroupe}
 					class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
 				>

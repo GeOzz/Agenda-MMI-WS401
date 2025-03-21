@@ -11,8 +11,7 @@
 	import { page } from '$app/state';
 
 	const matieres_options = Object.values(MATIERES);
-	let promotion = $state('1ère Année (BUT1)');
-	let selectedMatiere = $state(matieres_options[0].id);
+
 	let expire_le_timestamp = $state(new Date());
 	let groupes = $state([]);
 	let selectedGroupe = $state('');
@@ -38,8 +37,6 @@
 
 			// Populate form with existing data
 			titre = devoir.titre;
-			promotion = devoir.promotion || '1ère Année (BUT1)';
-			selectedMatiere = devoir.matiere;
 
 			// Convert timestamp to Date object for the datetime-local input
 			if (devoir.expire_le_timestamp) {
@@ -98,8 +95,6 @@
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					promotion,
-					matiere: selectedMatiere,
 					expire_le_timestamp: new Date(expire_le_timestamp).getTime(),
 					groupes: groupes.join(','),
 					markdown,
@@ -124,35 +119,6 @@
 	<h1 class="text-3xl font-bold mb-6">Modifier le devoir</h1>
 
 	<form onsubmit={handleSubmit} class="space-y-6">
-		<div class="grid grid-cols-2 gap-6">
-			<div>
-				<label class="block text-sm font-medium text-gray-700 mb-2">Promotion</label>
-				<select
-					required
-					bind:value={promotion}
-					class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-				>
-					<option>1ère Année (BUT1)</option>
-					<option>2ème Année (BUT2)</option>
-					<option>3ème Année (BUT3)</option>
-				</select>
-			</div>
-
-			<div>
-				<label class="block text-sm font-medium text-gray-700 mb-2">Matière</label>
-
-				<select
-					required
-					bind:value={selectedMatiere}
-					class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-				>
-					{#each matieres_options as matiere}
-						<option value={matiere.id}>{matiere.nom}</option>
-					{/each}
-				</select>
-			</div>
-		</div>
-
 		<div>
 			<label class="block text-sm font-medium text-gray-700 mb-2">Date et heure de rendu</label>
 			<input
@@ -180,7 +146,6 @@
 					{groupes.length === groupes_options.length ? 'Effacer' : 'Tous'}
 				</button>
 				<select
-					required
 					bind:value={selectedGroupe}
 					class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
 				>
