@@ -69,9 +69,14 @@ export const PUT: RequestHandler = async ({ request, params }) => {
 		where: eq(utilisateurs.id, SESSION_VALIDE.id_utilisateur)
 	});
 
+	const DEVOIR = await db.query.devoirs.findFirst({
+		where: eq(devoirs.id, Number(params.id))
+	});
+
 	if (
 		!UTILISATEUR?.role.includes(ERoleUtilisateur.PROFESSEUR) &&
-		!UTILISATEUR?.role.includes(ERoleUtilisateur.DELEGUE)
+		!UTILISATEUR?.role.includes(ERoleUtilisateur.DELEGUE) &&
+		UTILISATEUR?.id !== DEVOIR?.utilisateur_id_createur
 	) {
 		return new Response("Vous n'avez pas les droits pour modifier ce devoir", { status: 403 });
 	}
