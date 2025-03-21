@@ -72,36 +72,39 @@
 		<div class="flex">
 			<!-- Menu de navigation à gauche -->
 			<nav
-				class="w-64 h-screen bg-gray-100 text-black flex flex-col fixed top-0 left-0 overflow-y-auto"
+				class="w-64 h-screen bg-gray-100 text-black flex flex-col fixed left-0 overflow-y-auto shadow-lg"
 			>
 				<div class="p-4">
-					<h2 class="text-2xl font-bold">Menu</h2>
+					<h2 class="text-2xl font-bold">Action</h2>
+					<!-- Titre ajouté -->
 				</div>
-				<ul class="flex-1 p-4 space-y-2">
+				<ul class="flex-1 p-4 space-y-4">
 					<li>
-						<a href="/" class="block px-4 py-2 rounded hover:bg-gray-300 hover:bg-opacity-85"
-							>Accueil</a
+						<select
+							class="block w-full px-4 py-2 rounded border border-gray-300 bg-white text-black hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150 ease-in-out"
+							on:change={(e) => toggleDarkMode(e.target.value === 'dark')}
 						>
+							<option value="light">☀️ Mode Clair</option>
+							<option value="dark">🌙 Mode Sombre</option>
+						</select>
 					</li>
 					<li>
-						<a
-							href="/mes-devoirs"
-							class="block px-4 py-2 rounded hover:bg-gray-300 hover:bg-opacity-85">Mes Devoirs</a
+						<select
+							class="block w-full px-4 py-2 rounded border border-gray-300 bg-white text-black hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150 ease-in-out"
+							on:change={(e) => switchToLanguage(e.target.value)}
 						>
-					</li>
-					<li>
-						<a
-							href="/ajouter-devoir"
-							class="block px-4 py-2 rounded hover:bg-gray-300 hover:bg-opacity-85"
-							>Ajouter Devoir</a
-						>
-					</li>
-					<li>
-						<a href="/profil" class="block px-4 py-2 rounded hover:bg-gray-300 hover:bg-opacity-85"
-							>Profil</a
-						>
+							<option value="fr">🇫🇷 Français</option>
+							<option value="en">🇬🇧 English</option>
+						</select>
 					</li>
 				</ul>
+				<div class="p-4 mt-auto">
+					<button
+						class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition duration-150 ease-in-out"
+						>Mode sombre</button
+					>
+					<!-- Bouton ajouté -->
+				</div>
 			</nav>
 
 			<!-- Contenu principal -->
@@ -118,7 +121,7 @@
 				<div class="space-y-4 mb-8">
 					{#each DEVOIRS.toSorted((a, b) => a.timestamp - b.timestamp).slice(0, 3) as devoir}
 						<div
-							class=" shadow-md rounded-lg p-8 border-t border-b border-gray-300 flex justify-between items-center"
+							class="shadow-md rounded-lg p-8 border-t border-b border-gray-300 flex justify-between items-center"
 						>
 							<div class="flex items-center">
 								<div
@@ -157,13 +160,13 @@
 								<div class="flex justify-between items-center mt-2">
 									<button
 										on:click={() => handleVoirPlus(devoir?.id)}
-										class="px-4 py-2 bg-[#9385AB] bg-opacity-90 text-[#3B2A5B] font-bold rounded-md hover:bg-opacity-100"
+										class="px-4 py-2 bg-[#4D3677] bg-opacity-90 text-[#3B2A5B] font-bold rounded-md hover:bg-opacity-100 transition duration-150 ease-in-out"
 										>Voir plus</button
 									>
 									<div class="flex space-x-2">
 										<button
 											on:click={() => handleAFaire(devoir?.id)}
-											class="px-4 py-2 bg-[#F7B000] text-[#3B2A5B] font-bold rounded-md hover:bg-[#D69A00] {!devoirs_deja_fait?.includes(
+											class="px-4 py-2 bg-[#F7B000] text-[#3B2A5B] font-bold rounded-md hover:bg-[#D69A00] transition duration-150 ease-in-out {!devoirs_deja_fait?.includes(
 												devoir?.id
 											)
 												? 'opacity-50'
@@ -171,7 +174,7 @@
 										>
 										<button
 											on:click={() => handleDejaFait(devoir?.id)}
-											class="px-4 py-2 bg-[#DDD4EC] text-[#3B2A5B] font-bold rounded-md {devoirs_deja_fait?.includes(
+											class="px-4 py-2 bg-[#DDD4EC] text-[#3B2A5B] font-bold rounded-md transition duration-150 ease-in-out {devoirs_deja_fait?.includes(
 												devoir?.id
 											)
 												? 'opacity-50'

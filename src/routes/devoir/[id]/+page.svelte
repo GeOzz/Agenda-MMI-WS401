@@ -153,7 +153,7 @@
 			<!-- Main content -->
 			<div class="flex-1 bg-white shadow-lg rounded-r-lg overflow-hidden border border-gray-300">
 				<div class="relative">
-					<div class="w-full h-40 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500">
+					<div class="w-full h-40 bg-[#4D3677]">
 						<div class="flex justify-center items-center h-full w-full">
 							<h1 class="text-2xl font-bold text-white inline">
 								{MATIERES.find((_matiere) => _matiere.id === devoir.matiere)?.nom}
