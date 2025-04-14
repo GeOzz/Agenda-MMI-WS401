@@ -19,5 +19,9 @@ export const load: LayoutServerLoad = async ({ cookies }) => {
 		where: eq(utilisateurs.id, sessionValide.id_utilisateur)
 	});
 
+	if (!utilisateur) {
+		return { utilisateur: null };
+	}
+
 	return { utilisateur };
 };

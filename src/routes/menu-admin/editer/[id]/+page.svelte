@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import { EGroupeTD, EGroupeTP, ERoleUtilisateur } from '$lib/interfaces/IUtilisateur';
 
 	let utilisateur = {
 		nom: '',
@@ -15,8 +14,9 @@
 	};
 	let id: number;
 
-	let groupesTD = Object.values(EGroupeTD);
-	let groupesTP = Object.values(EGroupeTP);
+	// Groupes TD et leurs TP associés
+	const groupesTD = ['TD AB', 'TD CD', 'TD EF', 'TD GH', 'TD IJ'];
+	let groupesTP = []; // Liste des TP dynamiquement mise à jour
 
 	// Charger les données de l'utilisateur
 	onMount(async () => {
@@ -24,38 +24,43 @@
 		id = Number(params.id);
 		await chargerUtilisateur(id);
 
-		// Redirigez si l'utilisateur est un PROFESSEUR
-		if (utilisateur.role === 'PROFESSEUR') {
-			alert("Vous ne pouvez pas modifier un compte PROFESSEUR.");
-			goto('/menu-admin');
-		}
-
-		// Vérifiez si l'utilisateur connecté est un PROFESSEUR
-		if ($page.data.utilisateur.role !== 'PROFESSEUR') {
-			alert("Accès refusé : cette page est réservée aux professeurs.");
-			goto('/menu-admin');
-		}
+		// Mettre à jour les TP en fonction du TD actuel
+		mettreAJourGroupesTP(utilisateur.groupeTD);
 	});
 
+	// Fonction pour charger les données de l'utilisateur
 	async function chargerUtilisateur(id: number) {
 		try {
 			const response = await fetch(`/api/utilisateur/${id}`);
 			if (response.ok) {
 				utilisateur = await response.json();
+				mettreAJourGroupesTP(utilisateur.groupeTD); // Mettre à jour les TP après le chargement
 			} else {
-				alert('Erreur lors du chargement des données de l’utilisateur');
-				goto('/menu-admin');
+				goto('/menu-admin?erreur=chargement');
 			}
 		} catch (error) {
-			console.error('Erreur réseau:', error);
-			goto('/menu-admin');
+			goto('/menu-admin?erreur=reseau');
+		}
+	}
+
+	// Mettre à jour les TP en fonction du TD sélectionné
+	function mettreAJourGroupesTP(td: string) {
+		if (td === 'TD AB') groupesTP = ['TP A', 'TP B'];
+		else if (td === 'TD CD') groupesTP = ['TP C', 'TP D'];
+		else if (td === 'TD EF') groupesTP = ['TP E', 'TP F'];
+		else if (td === 'TD GH') groupesTP = ['TP G', 'TP H'];
+		else if (td === 'TD IJ') groupesTP = ['TP I', 'TP J'];
+		else groupesTP = [];
+
+		// Définir automatiquement le premier TP si le TP actuel n'est pas valide
+		if (!groupesTP.includes(utilisateur.groupeTP)) {
+			utilisateur.groupeTP = groupesTP[0] || ''; // Définit le premier TP ou vide si aucun TP
 		}
 	}
 
 	// Sauvegarder les modifications
 	async function sauvegarderUtilisateur() {
 		try {
-			console.log('Données envoyées:', utilisateur); // Log des données envoyées
 			const response = await fetch(`/api/utilisateur/${id}`, {
 				method: 'PUT',
 				headers: {
@@ -63,32 +68,13 @@
 				},
 				body: JSON.stringify(utilisateur)
 			});
-			console.log('Réponse brute:', response); // Log de la réponse brute
 			if (response.ok) {
-				alert('Utilisateur mis à jour avec succès');
-				goto('/menu-admin');
+				goto('/menu-admin?success=modification');
 			} else {
-				const errorText = await response.text();
-				console.error('Erreur lors de la mise à jour:', errorText); // Log de l'erreur
-				alert('Erreur lors de la mise à jour de l’utilisateur');
+				alert('Erreur lors de la mise à jour de l’utilisateur.');
 			}
 		} catch (error) {
-			console.error('Erreur réseau:', error);
-		}
-	}
-
-	// Supprimer l'utilisateur
-	async function supprimerUtilisateur() {
-		try {
-			const response = await fetch(`/api/utilisateur/${id}`, { method: 'DELETE' });
-			if (response.ok) {
-				alert('Utilisateur supprimé avec succès');
-				goto('/menu-admin');
-			} else {
-				alert('Erreur lors de la suppression de l’utilisateur');
-			}
-		} catch (error) {
-			console.error('Erreur réseau:', error);
+			alert('Erreur réseau lors de la mise à jour de l’utilisateur.');
 		}
 	}
 </script>
@@ -102,118 +88,81 @@
 	<div class="space-y-6 bg-white p-6 rounded-lg shadow-md">
 		<div class="grid grid-cols-2 gap-6">
 			<div>
-				<label class="block text-gray-700 font-bold mb-2">Nom</label>
-				<input
-					type="text"
-					bind:value={utilisateur.nom}
-					class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
-				/>
+					<label for="nom" class="block text-gray-700 font-bold mb-2">Nom</label>
+					<input
+						id="nom"
+						type="text"
+						bind:value={utilisateur.nom}
+						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+					/>
+				</div>
+				<div>
+					<label for="prenom" class="block text-gray-700 font-bold mb-2">Prénom</label>
+					<input
+						id="prenom"
+						type="text"
+						bind:value={utilisateur.prenom}
+						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+					/>
+				</div>
 			</div>
-			<div>
-				<label class="block text-gray-700 font-bold mb-2">Prénom</label>
-				<input
-					type="text"
-					bind:value={utilisateur.prenom}
-					class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
-				/>
-			</div>
-		</div>
 
-		<div>
-			<label class="block text-gray-700 font-bold mb-2">E-mail</label>
-			<input
-				type="email"
-				bind:value={utilisateur.email}
-				class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
-			/>
-		</div>
-
-		{#if utilisateur.role !== 'PROFESSEUR'}
 			<div>
-				<label class="block text-gray-700 font-bold mb-2">Promotion</label>
+				<label for="email" class="block text-gray-700 font-bold mb-2">E-mail</label>
 				<input
-					type="text"
-					bind:value={utilisateur.promotion}
+					id="email"
+					type="email"
+					bind:value={utilisateur.email}
 					class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
 				/>
 			</div>
 
 			<div class="grid grid-cols-2 gap-6">
 				<div>
-					<label class="block text-gray-700 font-bold mb-2">Groupe TD</label>
+					<label for="groupeTD" class="block text-gray-700 font-bold mb-2">Groupe TD</label>
 					<select
+						id="groupeTD"
 						bind:value={utilisateur.groupeTD}
+						on:change={() => mettreAJourGroupesTP(utilisateur.groupeTD)}
 						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
 					>
-						<option value="" disabled selected>Choisir un groupe TD</option>
+						<option value="" disabled>Choisir un groupe TD</option>
 						{#each groupesTD as groupe}
 							<option value={groupe}>{groupe}</option>
 						{/each}
 					</select>
 				</div>
 				<div>
-					<label class="block text-gray-700 font-bold mb-2">Groupe TP</label>
+					<label for="groupeTP" class="block text-gray-700 font-bold mb-2">Groupe TP</label>
 					<select
+						id="groupeTP"
 						bind:value={utilisateur.groupeTP}
 						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
 					>
-						<option value="" disabled selected>Choisir un groupe TP</option>
+						<option value="" disabled>Choisir un groupe TP</option>
 						{#each groupesTP as groupe}
 							<option value={groupe}>{groupe}</option>
 						{/each}
 					</select>
 				</div>
 			</div>
-		{/if}
-
-		<div>
-			<label class="block text-gray-700 font-bold mb-2">Rôles de l'utilisateur</label>
-			<div class="flex space-x-4">
-				<label class="flex items-center space-x-2">
-					<input
-						type="radio"
-						bind:group={utilisateur.role}
-						value={ERoleUtilisateur.ETUDIANT}
-						class="form-radio"
-					/>
-					<span>Étudiant</span>
-				</label>
-				<label class="flex items-center space-x-2">
-					<input
-						type="radio"
-						bind:group={utilisateur.role}
-						value={ERoleUtilisateur.DELEGUE}
-						class="form-radio"
-					/>
-					<span>Délégué</span>
-				</label>
-				<label class="flex items-center space-x-2">
-					<input
-						type="radio"
-						bind:group={utilisateur.role}
-						value={ERoleUtilisateur.PROFESSEUR}
-						class="form-radio"
-					/>
-					<span>Professeur</span>
-				</label>
-			</div>
 		</div>
-	</div>
 
-	<div class="mt-6 flex justify-between items-center">
-		<div class="flex space-x-4">
-			<button
-				class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-semibold"
-				onclick={() => goto('/menu-admin')}
-			>
-				Annuler
-			</button>
-			<button
-				class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 font-semibold"
-				onclick={sauvegarderUtilisateur}
-			>
-				Enregistrer
-			</button>
+		<div class="mt-6 flex justify-between items-center">
+			<div class="flex space-x-4">
+				<button
+					class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-semibold"
+					onclick={() => goto('/menu-admin')}
+				>
+					Annuler
+				</button>
+				<button
+					class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 font-semibold"
+					onclick={sauvegarderUtilisateur}
+				>
+					Enregistrer
+				</button>
+			</div>
 		</div>
 	</div>
 </div>
