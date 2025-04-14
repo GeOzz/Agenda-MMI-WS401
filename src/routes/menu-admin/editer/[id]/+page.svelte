@@ -88,34 +88,34 @@
 	<div class="space-y-6 bg-white p-6 rounded-lg shadow-md">
 		<div class="grid grid-cols-2 gap-6">
 			<div>
-					<label for="nom" class="block text-gray-700 font-bold mb-2">Nom</label>
-					<input
-						id="nom"
-						type="text"
-						bind:value={utilisateur.nom}
-						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
-					/>
-				</div>
-				<div>
-					<label for="prenom" class="block text-gray-700 font-bold mb-2">Prénom</label>
-					<input
-						id="prenom"
-						type="text"
-						bind:value={utilisateur.prenom}
-						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
-					/>
-				</div>
-			</div>
-
-			<div>
-				<label for="email" class="block text-gray-700 font-bold mb-2">E-mail</label>
+				<label for="nom" class="block text-gray-700 font-bold mb-2">Nom</label>
 				<input
-					id="email"
-					type="email"
-					bind:value={utilisateur.email}
+					id="nom"
+					type="text"
+					bind:value={utilisateur.nom}
 					class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
 				/>
 			</div>
+			<div>
+				<label for="prenom" class="block text-gray-700 font-bold mb-2">Prénom</label>
+				<input
+					id="prenom"
+					type="text"
+					bind:value={utilisateur.prenom}
+					class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+				/>
+			</div>
+		</div>
+
+		<div>
+			<label for="email" class="block text-gray-700 font-bold mb-2">E-mail</label>
+			<input
+				id="email"
+				type="email"
+				bind:value={utilisateur.email}
+				class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+			/>
+		</div>
 
 			<div class="grid grid-cols-2 gap-6">
 				<div>
@@ -123,7 +123,7 @@
 					<select
 						id="groupeTD"
 						bind:value={utilisateur.groupeTD}
-						on:change={() => mettreAJourGroupesTP(utilisateur.groupeTD)}
+						onchange={() => mettreAJourGroupesTP(utilisateur.groupeTD)}
 						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
 					>
 						<option value="" disabled>Choisir un groupe TD</option>
@@ -146,23 +146,22 @@
 					</select>
 				</div>
 			</div>
-		</div>
+	</div>
 
-		<div class="mt-6 flex justify-between items-center">
-			<div class="flex space-x-4">
-				<button
-					class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-semibold"
-					onclick={() => goto('/menu-admin')}
-				>
-					Annuler
-				</button>
-				<button
-					class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 font-semibold"
-					onclick={sauvegarderUtilisateur}
-				>
-					Enregistrer
-				</button>
-			</div>
+	<div class="mt-6 flex justify-between items-center">
+		<div class="flex space-x-4">
+			<button
+				class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-semibold"
+				onclick={() => goto('/menu-admin')}
+			>
+				Annuler
+			</button>
+			<button
+				class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 font-semibold"
+				onclick={sauvegarderUtilisateur}
+			>
+				Enregistrer
+			</button>
 		</div>
 	</div>
 </div>
