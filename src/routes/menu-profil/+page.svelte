@@ -1,183 +1,162 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
-	import { STORE } from '$lib/store.svelte';
-	import { EPromotion, EGroupeTD, EGroupeTP } from '$lib/interfaces/IUtilisateur';
+	import { STORE } from '$lib/store.svelte'; // Importez le STORE pour mettre à jour les données utilisateur
 
-	let utilisateur = $state({
+	let utilisateur = {
+		id: null, // Ajoutez l'ID ici pour éviter les erreurs
 		nom: '',
 		prenom: '',
 		email: '',
+		role: '',
 		groupeTD: '',
 		groupeTP: '',
 		promotion: ''
+	};
+
+	// Charger les données utilisateur depuis `$page.data`
+	onMount(() => {
+		utilisateur = $page.data.utilisateur;
 	});
 
-	let groupesTD = Object.values(EGroupeTD);
-	let groupesTP = Object.values(EGroupeTP);
-
-	$effect(() => {
-		if (STORE.utilisateur) {
-			utilisateur = { ...STORE.utilisateur };
-		}
-	});
-
-	async function handleSave() {
+	async function sauvegarderProfil() {
 		try {
-			const response = await fetch('/api/mon-compte', {
-				method: 'POST',
+			console.log('Données envoyées:', {
+				nom: utilisateur.nom,
+				prenom: utilisateur.prenom,
+				email: utilisateur.email
+			}); // Log des données envoyées
+
+			const response = await fetch(`/api/utilisateur/${utilisateur.id}`, {
+				method: 'PUT',
 				headers: {
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					promotion: utilisateur.promotion,
-					groupeTD: utilisateur.groupeTD,
-					groupeTP: utilisateur.groupeTP
-				})
+					nom: utilisateur.nom,
+					prenom: utilisateur.prenom,
+					email: utilisateur.email
+				}) // Seules les informations personnelles sont envoyées
 			});
 
+			console.log('Réponse API:', response); // Log de la réponse brute
+
 			if (response.ok) {
-				console.log('Modifications sauvegardées', utilisateur);
-				alert('Modifications sauvegardées avec succès');
+				alert('Profil mis à jour avec succès');
+				// Mettez à jour le STORE pour refléter les modifications dans le menu
+				STORE.utilisateur = { ...STORE.utilisateur, ...utilisateur };
 			} else {
-				console.error('Erreur lors de la sauvegarde des modifications');
-				alert('Erreur lors de la sauvegarde des modifications');
+				const errorText = await response.text();
+				console.error('Erreur lors de la mise à jour du profil:', errorText);
+				alert('Erreur lors de la mise à jour du profil');
 			}
 		} catch (error) {
-			console.error('Erreur lors de la sauvegarde des modifications', error);
-			alert('Erreur lors de la sauvegarde des modifications');
+			console.error('Erreur réseau:', error);
+			alert('Erreur réseau lors de la mise à jour du profil');
 		}
 	}
-
-	const FILTERED_GROUPES_TP = $derived.by(() => {
-		if (!utilisateur.groupeTD) return groupesTP;
-
-		const tdLetters = utilisateur.groupeTD.replace('TD ', '').split('');
-
-		return groupesTP.filter((tp) => {
-			const tpLetter = tp.replace('TP ', '');
-			return tdLetters.includes(tpLetter);
-		});
-	});
 </script>
 
-<div class="flex">
-	<!-- Menu de navigation à gauche -->
-	<nav
-		class="w-64 h-screen bg-gray-100 text-black flex flex-col fixed top-0 left-0 overflow-y-auto"
-	>
-	</nav>
+<div class="flex min-h-screen bg-gray-50">
+	<!-- Navigation latérale -->
+	<div class="w-1/4 bg-white shadow-md p-6">
+		<h2 class="text-xl font-bold text-gray-800 mb-4">Navigation</h2>
+		<ul class="space-y-4">
+			<li>
+				<a href="/menu-profil" class="text-purple-600 font-semibold hover:underline">Détail du profil</a>
+			</li>
+			<li>
+				<a href="/menu-profil/acces-securite" class="text-gray-600 hover:text-purple-600 hover:underline">Accès et Sécurité</a>
+			</li>
+		</ul>
+	</div>
 
 	<!-- Contenu principal -->
-	<div class="flex-1 ml-64 max-w-7xl mx-auto p-8 mt-6 bg-white">
-		<h1 class="text-3xl font-bold mb-6">Détails du Profil</h1>
-		<p class="text-gray-600 mb-6">
-			Gérez les détails de votre compte qui représentent comment les autres utilisateurs vous
-			voient, en plus d'autres détails utilisés pour la communication et la personnalisation du
-			système.
+	<div class="w-3/4 p-8">
+		<h1 class="text-4xl font-bold mb-6 text-gray-800">Détails du Profil</h1>
+		<p class="text-gray-600 mb-8">
+			Gérez les détails de votre compte qui représentent comment les autres utilisateurs vous voient, en plus d'autres détails utilisés pour la communication et la personnalisation du système.
 		</p>
-		<div class="space-y-4">
-			<div class="flex space-x-4">
-				<div class="flex-1 relative">
-					<label class="block text-gray-700 font-bold">Nom</label>
-					<div class="relative">
-						<input
-							type="text"
-							value={utilisateur.nom}
-							class="w-full p-2 border border-gray-300 rounded bg-gray-100 cursor-default"
-							readonly
-						/>
-						<div class="absolute inset-0 diagonal-stripes pointer-events-none"></div>
-					</div>
-				</div>
-				<div class="flex-1 relative">
-					<label class="block text-gray-700 font-bold">Prénom</label>
-					<div class="relative">
-						<input
-							type="text"
-							value={utilisateur.prenom}
-							class="w-full p-2 border border-gray-300 rounded bg-gray-100 cursor-default"
-							readonly
-						/>
-						<div class="absolute inset-0 diagonal-stripes pointer-events-none"></div>
-					</div>
-				</div>
-				<div class="flex-1 relative">
-					<label class="block text-gray-700 font-bold">Role</label>
-					<div class="relative">
-						<input
-							type="text"
-							value={utilisateur.role}
-							class="w-full p-2 border border-gray-300 rounded bg-gray-100 cursor-default"
-							readonly
-						/>
-						<div class="absolute inset-0 diagonal-stripes pointer-events-none"></div>
-					</div>
-				</div>
-			</div>
-			<hr class="my-4 border-gray-300" />
-			<div>
-				<label class="block text-gray-700 font-bold">Promotion</label>
-				<select
-					bind:value={utilisateur.promotion}
-					class="w-full p-2 border border-gray-300 rounded"
-				>
-					{#each Object.values(EPromotion) as promotion}
-						<option value={promotion}>{promotion}</option>
-					{/each}
-				</select>
-			</div>
-			<hr class="my-4 border-gray-300" />
-			<div class="flex space-x-4">
-				<div class="flex-1">
-					<label class="block text-gray-700 font-bold">Groupe TD</label>
-					<select
-						onchange={() => {
-							utilisateur.groupeTP = FILTERED_GROUPES_TP[0];
-						}}
-						bind:value={utilisateur.groupeTD}
-						class="w-full p-2 border border-gray-300 rounded"
-					>
-						{#each groupesTD as groupe}
-							<option selected={utilisateur.groupeTD === groupe} value={groupe}>
-								{groupe}
-							</option>
-						{/each}
-					</select>
-				</div>
-				<div class="flex-1">
-					<label class="block text-gray-700 font-bold">Groupe TP</label>
-					<select
-						bind:value={utilisateur.groupeTP}
-						class="w-full p-2 border border-gray-300 rounded"
-					>
-						{#each FILTERED_GROUPES_TP as groupe}
-							<option selected={utilisateur?.groupeTP === groupe} value={groupe}>
-								{groupe}
-							</option>
-						{/each}
-					</select>
-				</div>
-			</div>
-			<hr class="my-4 border-gray-300" />
-			<div class="relative">
-				<label class="block text-gray-700 font-bold">E-mail</label>
-				<div class="relative">
+
+		<div class="space-y-6 bg-white p-6 rounded-lg shadow-md">
+			<div class="grid grid-cols-2 gap-6">
+				<div>
+					<label class="block text-gray-700 font-bold mb-2">Nom</label>
 					<input
-						type="email"
-						value={utilisateur.email}
-						class="w-full p-2 border border-gray-300 rounded bg-gray-100 cursor-default"
-						readonly
+						type="text"
+						bind:value={utilisateur.nom}
+						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
 					/>
-					<div class="absolute inset-0 diagonal-stripes pointer-events-none"></div>
+				</div>
+				<div>
+					<label class="block text-gray-700 font-bold mb-2">Prénom</label>
+					<input
+						type="text"
+						bind:value={utilisateur.prenom}
+						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+					/>
 				</div>
 			</div>
 
-			<hr class="my-4 border-gray-300" />
-			<div class="flex justify-end space-x-4">
-				<button onclick={handleSave} class="px-4 py-2 bg-[#CAC3D6] text-[#3B2A5B] rounded"
-					>Enregistrer</button
-				>
+			<div>
+				<label class="block text-gray-700 font-bold mb-2">E-mail</label>
+				<input
+					type="email"
+					bind:value={utilisateur.email}
+					class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+				/>
 			</div>
+
+			<!-- Les champs suivants sont désactivés pour les étudiants -->
+			<div>
+				<label class="block text-gray-700 font-bold mb-2">Promotion</label>
+				<input
+					type="text"
+					value={utilisateur.promotion}
+					disabled
+					class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-500"
+				/>
+			</div>
+
+			<div class="grid grid-cols-2 gap-6">
+				<div>
+					<label class="block text-gray-700 font-bold mb-2">Groupe TD</label>
+					<input
+						type="text"
+						value={utilisateur.groupeTD}
+						disabled
+						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-500"
+					/>
+				</div>
+				<div>
+					<label class="block text-gray-700 font-bold mb-2">Groupe TP</label>
+					<input
+						type="text"
+						value={utilisateur.groupeTP}
+						disabled
+						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-500"
+					/>
+				</div>
+			</div>
+
+			<div>
+				<label class="block text-gray-700 font-bold mb-2">Rôle</label>
+				<input
+					type="text"
+					value={utilisateur.role}
+					disabled
+					class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-500"
+				/>
+			</div>
+		</div>
+
+		<div class="mt-6 flex justify-end">
+			<button
+				class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 font-semibold"
+				onclick={sauvegarderProfil}
+			>
+				Enregistrer
+			</button>
 		</div>
 	</div>
 </div>
@@ -194,11 +173,11 @@
 		width: 100%;
 		height: 100%;
 		display: flex;
-		align-items: center;
 		justify-content: center;
-		color: #333;
+		align-items: center;
 		font-weight: bold;
-		z-index: 1;
+		color: #333;
 		pointer-events: none;
+		z-index: 1;
 	}
 </style>

@@ -1,0 +1,17 @@
+/* Supprimez ou ajustez tout style qui fixe le menu en haut */
+nav {
+	/* ...existing code... */
+	position: relative; /* Assurez-vous que le menu n'est pas fixé */
+	/* ...existing code... */
+}
+
+/* Masquer le menu par défaut */
+nav.hidden {
+	display: none;
+}
+
+/* Vérifiez qu'aucun style global n'ajoute une balise <nav> supplémentaire */
+nav {
+	/* ...existing code... */
+	position: relative;
+}

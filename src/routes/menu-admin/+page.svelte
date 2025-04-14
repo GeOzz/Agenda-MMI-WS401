@@ -1,25 +1,40 @@
 <script lang="ts">
-	let utilisateurs = [
-		{ id: 1, nom: 'John Doe', email: 'john@example.com', role: 'Admin' },
-		{ id: 2, nom: 'Jane Smith', email: 'jane@example.com', role: 'User' },
-		{ id: 3, nom: 'Alice Johnson', email: 'alice@example.com', role: 'User' },
-		{ id: 4, nom: 'Bob Brown', email: 'bob@example.com', role: 'Admin' },
-		{ id: 5, nom: 'Charlie White', email: 'charlie@example.com', role: 'User' },
-		{ id: 6, nom: 'Diana Green', email: 'diana@example.com', role: 'Admin' },
-	];
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
+
+	let utilisateurs = [];
 	let recherche = '';
 	let tri = 'Nom';
 	let pageActuelle = 1;
 	const utilisateursParPage = 5;
 
-	// Fonction pour supprimer un utilisateur
-	function supprimerUtilisateur(id: number) {
-		utilisateurs = utilisateurs.filter((user) => user.id !== id);
+	// Charger les utilisateurs depuis l'API
+	onMount(async () => {
+		await chargerUtilisateurs();
+	});
+
+	async function chargerUtilisateurs() {
+		try {
+			const response = await fetch('/api/utilisateur');
+			if (response.ok) {
+				utilisateurs = await response.json();
+			} else {
+				console.error('Erreur lors du chargement des utilisateurs:', await response.text());
+			}
+		} catch (error) {
+			console.error('Erreur réseau:', error);
+		}
 	}
 
-	// Fonction pour éditer un utilisateur
+	// Fonction pour rediriger vers la page de confirmation de suppression
+	function confirmerSuppressionUtilisateur(id: number) {
+		goto(`/menu-admin/supprimer/${id}`); // Redirection vers la page de confirmation
+	}
+
+	// Fonction pour rediriger vers la page d'édition
 	function editerUtilisateur(id: number) {
-		alert(`Redirection vers la page d'édition pour l'utilisateur avec l'ID ${id}`);
+		goto(`/menu-admin/editer/${id}`);
 	}
 
 	// Filtrer et trier les utilisateurs
@@ -80,27 +95,24 @@
 		<tbody>
 			{#each utilisateursAffiches as utilisateur}
 				<tr class="hover:bg-gray-50">
-					<td class="px-6 py-4 border-b flex items-center space-x-3">
-						<span class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500">
-							<i class="i-ph:user-circle"></i>
-						</span>
-						<span>{utilisateur.nom}</span>
-					</td>
+					<td class="px-6 py-4 border-b">{utilisateur.nom}</td>
 					<td class="px-6 py-4 border-b">{utilisateur.email}</td>
 					<td class="px-6 py-4 border-b">{utilisateur.role}</td>
 					<td class="px-6 py-4 border-b text-center">
-						<button
-							class="px-4 py-2 bg-[#FDB813] text-white rounded-md hover:bg-[#EAA10D] mr-2 font-semibold"
-							onclick={() => editerUtilisateur(utilisateur.id)}
-						>
-							Éditer
-						</button>
-						<button
-							class="px-4 py-2 bg-[#CAC3D6] text-[#3B2A5B] rounded-md hover:bg-[#B5ADC4] font-semibold"
-							onclick={() => supprimerUtilisateur(utilisateur.id)}
-						>
-							Supprimer
-						</button>
+						{#if utilisateur.role !== 'PROFESSEUR'}
+							<button
+								class="px-4 py-2 bg-[#FDB813] text-white rounded-md hover:bg-[#EAA10D] mr-2 font-semibold"
+								onclick={() => editerUtilisateur(utilisateur.id)}
+							>
+								Éditer
+							</button>
+							<button
+								class="px-4 py-2 bg-[#CAC3D6] text-[#3B2A5B] rounded-md hover:bg-[#B5ADC4] font-semibold"
+								onclick={() => confirmerSuppressionUtilisateur(utilisateur.id)}
+							>
+								Supprimer
+							</button>
+						{/if}
 					</td>
 				</tr>
 			{:else}
