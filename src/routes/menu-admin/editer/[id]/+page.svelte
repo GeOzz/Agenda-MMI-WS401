@@ -14,6 +14,7 @@
 		promotion: ''
 	};
 	let id: number;
+	let showSuccessPopup = false; // État pour afficher le popup de succès
 
 	// Groupes TD et leurs TP associés
 	const groupesTD = ['TD AB', 'TD CD', 'TD EF', 'TD GH', 'TD IJ'];
@@ -76,13 +77,41 @@
 				return;
 			}
 
-			// Rediriger en cas de succès
-			goto('/menu-admin?success=modification');
+				// Afficher le popup de succès
+			showSuccessPopup = true;
+			console.log('Popup affiché'); // Débogage
+			setTimeout(() => {
+				showSuccessPopup = false;
+				goto('/menu-admin?success=modification'); // Rediriger après un délai
+			}, 2000);
 		} catch (error) {
 			alert('Erreur réseau lors de la mise à jour de l’utilisateur.');
 			console.error(error);
 		}
 	}
+
+	// Supprimer l'utilisateur (fonction inutilisée ici, peut être supprimée si non utilisée ailleurs)
+	// async function supprimerUtilisateur() {
+	// 	if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
+	// 		try {
+	// 			const response = await fetch(`/api/utilisateur/${id}`, {
+	// 				method: 'DELETE'
+	// 			});
+
+	// 			if (!response.ok) {
+	// 				const error = await response.text();
+	// 				alert('Erreur : ' + error);
+	// 				return;
+	// 			}
+
+	// 			alert('Utilisateur supprimé avec succès.');
+	// 			goto('/menu-admin');
+	// 		} catch (error) {
+	// 			alert('Erreur réseau lors de la suppression de l’utilisateur.');
+	// 			console.error(error);
+	// 		}
+	// 	}
+	// }
 </script>
 
 <div class="p-8 bg-gray-50 min-h-screen">
@@ -90,6 +119,15 @@
 	<p class="text-gray-600 mb-8">
 		Gérez les détails de ce compte utilisateur, y compris les informations personnelles, le rôle et les groupes.
 	</p>
+
+	<!-- Popup de succès -->
+	{#if showSuccessPopup}
+		<div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+			<div class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+				Modification effectuée avec succès !
+			</div>
+		</div>
+	{/if}
 
 	<div class="space-y-6 bg-white p-6 rounded-lg shadow-md">
 		<div class="grid grid-cols-2 gap-6">

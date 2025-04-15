@@ -12,6 +12,13 @@
 	function fermerMenu() {
 		menuOuvert = false;
 	}
+
+	// Fonction pour formater le nom et l'initiale du prénom
+	function formatNomPrenom(nom: string, prenom: string) {
+		const nomFormate = nom.trim().toUpperCase(); // Supprime les espaces et met en majuscules
+		const prenomFormate = prenom.trim().charAt(0).toUpperCase() + '.'; // Prend uniquement l'initiale en majuscule suivie d'un point
+		return { nomFormate, prenomFormate };
+	}
 </script>
 
 <div class="bg-[#4B3B7C] text-white p-4 h-40 sm:h-18 w-full fixed top-0 left-0 right-0 z-50">
@@ -62,7 +69,12 @@
 						onclick={toggleMenu}
 					>
 						<span class="w-8 h-8 i-ph:user-circle"></span>
-						<span>{STORE.utilisateur?.nom}</span>
+						{#if STORE.utilisateur?.nom && STORE.utilisateur?.prenom}
+							<span>
+								{formatNomPrenom(STORE.utilisateur.nom, STORE.utilisateur.prenom).nomFormate}{' '}
+								{formatNomPrenom(STORE.utilisateur.nom, STORE.utilisateur.prenom).prenomFormate}
+							</span>
+						{/if}
 						<span class="w-4 h-4 i-ph:caret-down"></span>
 					</button>
 

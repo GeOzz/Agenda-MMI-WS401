@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 
 	let id: number;
+	let showSuccessPopup = false; // État pour afficher le popup de succès
 
 	// Récupérer l'ID de l'utilisateur à supprimer
 	$: id = Number($page.params.id);
@@ -41,8 +42,10 @@
 		try {
 			const response = await fetch(`/api/utilisateur/${id}`, { method: 'DELETE' });
 			if (response.ok) {
-				alert('Utilisateur supprimé avec succès');
-				goto('/menu-admin');
+				showSuccessPopup = true; // Afficher le popup de succès
+				setTimeout(() => {
+					goto('/menu-admin'); // Rediriger après un délai
+				}, 2000);
 			} else {
 				alert('Erreur lors de la suppression de l’utilisateur');
 			}
@@ -58,6 +61,15 @@
 </script>
 
 <div class="flex items-center justify-center min-h-screen bg-gray-100">
+	<!-- Popup de succès -->
+	{#if showSuccessPopup}
+		<div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+			<div class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+				Utilisateur supprimé avec succès !
+			</div>
+		</div>
+	{/if}
+
 	<div class="bg-white p-8 rounded-lg shadow-md max-w-lg w-full">
 		<h1 class="text-2xl font-bold text-gray-800 mb-4">Supprimer un utilisateur</h1>
 		<p class="text-gray-600 mb-6">
