@@ -5,6 +5,7 @@ import { devoirs, utilisateurs } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { ERoleUtilisateur } from '$lib/interfaces/IUtilisateur';
+import { json } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ request, params }) => {
 	const COOKIE = request.headers.get('Cookie');
@@ -45,47 +46,42 @@ export const DELETE: RequestHandler = async ({ params }) => {
 	}
 };
 
-export const PUT: RequestHandler = async ({ request, params, cookies }) => {
-	const session = cookies.get('session');
-	if (!session) {
-		return new Response('Session invalide', { status: 401 });
+export const PUT: RequestHandler = async ({ params, request }) => {
+	// Récupérer l'ID de l'utilisateur depuis les paramètres
+	const id = Number(params.id);
+
+	// Vérifier que l'ID est valide
+	if (!id) {
+		return json({ error: 'ID utilisateur invalide' }, { status: 400 });
 	}
 
-	const sessionValide = await checkSessionValide(session);
-	if (!sessionValide) {
-		return new Response('Session invalide', { status: 401 });
-	}
+	// Récupérer les données envoyées dans la requête
+	const utilisateur = await request.json();
 
-	const utilisateurConnecte = await db.query.utilisateurs.findFirst({
-		where: eq(utilisateurs.id, sessionValide.id_utilisateur)
-	});
-
-	if (!utilisateurConnecte) {
-		return new Response('Utilisateur non trouvé', { status: 404 });
+	// Vérifier que les données nécessaires sont présentes
+	if (!utilisateur.nom || !utilisateur.prenom || !utilisateur.email) {
+		return json({ error: 'Données utilisateur incomplètes' }, { status: 400 });
 	}
 
 	try {
-		const id = Number(params.id);
-		const body = await request.json();
-
-		// Validation des données
-		if (!body.nom || !body.prenom || !body.email) {
-			return new Response('Données invalides', { status: 400 });
-		}
-
-		// Mise à jour de l'utilisateur
+		// Mettre à jour l'utilisateur dans la base de données
 		await db
 			.update(utilisateurs)
 			.set({
-				nom: body.nom,
-				prenom: body.prenom,
-				email: body.email
+				nom: utilisateur.nom,
+				prenom: utilisateur.prenom,
+				email: utilisateur.email,
+				role: utilisateur.role,
+				promotion: utilisateur.promotion,
+				groupeTD: utilisateur.groupeTD,
+				groupeTP: utilisateur.groupeTP
 			})
 			.where(eq(utilisateurs.id, id));
 
-		return new Response('Utilisateur mis à jour avec succès', { status: 200 });
+		// Retourner une réponse de succès
+		return json({ success: true });
 	} catch (error) {
-		console.error('Erreur lors de la mise à jour de l’utilisateur:', error);
-		return new Response('Erreur interne du serveur', { status: 500 });
+		console.error('Erreur lors de la mise à jour de l’utilisateur :', error);
+		return json({ error: 'Erreur interne du serveur' }, { status: 500 });
 	}
 };

@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import { EPromotion, ERoleUtilisateur } from '$lib/interfaces/IUtilisateur'; // Ajout de l'importation
 
 	let utilisateur = {
 		nom: '',
@@ -68,13 +69,18 @@
 				},
 				body: JSON.stringify(utilisateur)
 			});
-			if (response.ok) {
-				goto('/menu-admin?success=modification');
-			} else {
-				alert('Erreur lors de la mise à jour de l’utilisateur.');
+
+			if (!response.ok) {
+				const error = await response.json();
+				alert('Erreur : ' + (error.error || 'Erreur inconnue'));
+				return;
 			}
+
+			// Rediriger en cas de succès
+			goto('/menu-admin?success=modification');
 		} catch (error) {
 			alert('Erreur réseau lors de la mise à jour de l’utilisateur.');
+			console.error(error);
 		}
 	}
 </script>
@@ -117,51 +123,83 @@
 			/>
 		</div>
 
-			<div class="grid grid-cols-2 gap-6">
-				<div>
-					<label for="groupeTD" class="block text-gray-700 font-bold mb-2">Groupe TD</label>
-					<select
-						id="groupeTD"
-						bind:value={utilisateur.groupeTD}
-						onchange={() => mettreAJourGroupesTP(utilisateur.groupeTD)}
-						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
-					>
-						<option value="" disabled>Choisir un groupe TD</option>
-						{#each groupesTD as groupe}
-							<option value={groupe}>{groupe}</option>
-						{/each}
-					</select>
-				</div>
-				<div>
-					<label for="groupeTP" class="block text-gray-700 font-bold mb-2">Groupe TP</label>
-					<select
-						id="groupeTP"
-						bind:value={utilisateur.groupeTP}
-						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
-					>
-						<option value="" disabled>Choisir un groupe TP</option>
-						{#each groupesTP as groupe}
-							<option value={groupe}>{groupe}</option>
-						{/each}
-					</select>
-				</div>
-			</div>
-	</div>
+		<div>
+			<label for="promotion" class="block text-gray-700 font-bold mb-2">Promotion</label>
+			<select
+				id="promotion"
+				bind:value={utilisateur.promotion}
+				class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+			>
+				<option value="" disabled>Choisir une promotion</option>
+				{#each Object.values(EPromotion) as promotion}
+					<option value={promotion}>{promotion}</option>
+				{/each}
+			</select>
+		</div>
 
-	<div class="mt-6 flex justify-between items-center">
-		<div class="flex space-x-4">
-			<button
-				class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-semibold"
-				onclick={() => goto('/menu-admin')}
-			>
-				Annuler
-			</button>
-			<button
-				class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 font-semibold"
-				onclick={sauvegarderUtilisateur}
-			>
-				Enregistrer
-			</button>
+		<div>
+			<label class="block text-gray-700 font-bold mb-2">Rôles de l'utilisateur</label>
+			<div class="flex flex-wrap gap-4">
+				{#each Object.values(ERoleUtilisateur).filter(role => role !== 'PROFESSEUR') as role}
+					<label class="flex items-center space-x-2">
+						<input
+							type="radio"
+							name="role"
+							value={role}
+							bind:group={utilisateur.role}
+							class="form-radio text-purple-500 focus:ring-purple-500"
+						/>
+						<span class="text-gray-700">{role}</span>
+					</label>
+				{/each}
+			</div>
+		</div>
+
+		<div class="grid grid-cols-2 gap-6">
+			<div>
+				<label for="groupeTD" class="block text-gray-700 font-bold mb-2">Groupe TD</label>
+				<select
+					id="groupeTD"
+					bind:value={utilisateur.groupeTD}
+					onchange={() => mettreAJourGroupesTP(utilisateur.groupeTD)}
+					class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+				>
+					<option value="" disabled>Choisir un groupe TD</option>
+					{#each groupesTD as groupe}
+						<option value={groupe}>{groupe}</option>
+					{/each}
+				</select>
+			</div>
+			<div>
+				<label for="groupeTP" class="block text-gray-700 font-bold mb-2">Groupe TP</label>
+				<select
+					id="groupeTP"
+					bind:value={utilisateur.groupeTP}
+					class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+				>
+					<option value="" disabled>Choisir un groupe TP</option>
+					{#each groupesTP as groupe}
+						<option value={groupe}>{groupe}</option>
+					{/each}
+				</select>
+			</div>
+		</div>
+
+		<div class="mt-6 flex justify-between items-center">
+			<div class="flex space-x-4">
+				<button
+					class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-semibold"
+					onclick={() => goto('/menu-admin')}
+				>
+					Annuler
+				</button>
+				<button
+					class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 font-semibold"
+					onclick={sauvegarderUtilisateur}
+				>
+					Enregistrer
+				</button>
+			</div>
 		</div>
 	</div>
 </div>
