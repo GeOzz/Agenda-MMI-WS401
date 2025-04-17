@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Error from '../../../error.svelte';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
@@ -15,6 +16,7 @@
 	};
 	let id: number;
 	let showSuccessPopup = false; // État pour afficher le popup de succès
+	let erreur = null;
 
 	// Groupes TD et leurs TP associés
 	const groupesTD = ['TD AB', 'TD CD', 'TD EF', 'TD GH', 'TD IJ'];
@@ -38,10 +40,10 @@
 				utilisateur = await response.json();
 				mettreAJourGroupesTP(utilisateur.groupeTD); // Mettre à jour les TP après le chargement
 			} else {
-				goto('/menu-admin?erreur=chargement');
+				erreur = { status: response.status, message: "Erreur lors du chargement des données utilisateur." };
 			}
 		} catch (error) {
-			goto('/menu-admin?erreur=reseau');
+			erreur = { status: 500, message: "Erreur réseau ou problème serveur." };
 		}
 	}
 
@@ -60,8 +62,25 @@
 		}
 	}
 
+	let message = '';
+	let messageType = ''; // 'success' ou 'error'
+
+	function afficherMessage(type: string, texte: string) {
+		messageType = type;
+		message = texte;
+		setTimeout(() => {
+			message = '';
+		}, 3000); // Le message disparaît après 3 secondes
+	}
+
 	// Sauvegarder les modifications
 	async function sauvegarderUtilisateur() {
+		// Validation des champs nom et prénom
+		if (utilisateur.nom.length < 3 || utilisateur.prenom.length < 3) {
+			afficherMessage('error', 'Le nom et le prénom doivent contenir au moins 3 caractères.');
+			return;
+		}
+
 		try {
 			const response = await fetch(`/api/utilisateur/${id}`, {
 				method: 'PUT',
@@ -71,22 +90,17 @@
 				body: JSON.stringify(utilisateur)
 			});
 
-			if (!response.ok) {
+			if (response.ok) {
+				afficherMessage('success', 'Modification effectuée avec succès.');
+				setTimeout(() => {
+					goto('/menu-admin'); // Redirection après succès
+				}, 3500); // Attendre la fin de l'animation
+			} else {
 				const error = await response.json();
-				alert('Erreur : ' + (error.error || 'Erreur inconnue'));
-				return;
+				afficherMessage('error', error.message || 'Erreur lors de la mise à jour.');
 			}
-
-				// Afficher le popup de succès
-			showSuccessPopup = true;
-			console.log('Popup affiché'); // Débogage
-			setTimeout(() => {
-				showSuccessPopup = false;
-				goto('/menu-admin?success=modification'); // Rediriger après un délai
-			}, 2000);
 		} catch (error) {
-			alert('Erreur réseau lors de la mise à jour de l’utilisateur.');
-			console.error(error);
+			afficherMessage('error', 'Erreur réseau lors de la mise à jour.');
 		}
 	}
 
@@ -114,130 +128,168 @@
 	// }
 </script>
 
-<div class="p-8 bg-gray-50 min-h-screen">
-	<h1 class="text-4xl font-bold mb-6 text-gray-800">Modifier l'utilisateur</h1>
-	<p class="text-gray-600 mb-8">
-		Gérez les détails de ce compte utilisateur, y compris les informations personnelles, le rôle et les groupes.
-	</p>
+{#if erreur}
+	<Error status={erreur.status} message={erreur.message} />
+{:else}
+	<div class="p-8 bg-gray-50 min-h-screen">
+		<h1 class="text-4xl font-bold mb-6 text-gray-800">Modifier l'utilisateur</h1>
+		<p class="text-gray-600 mb-8">
+			Gérez les détails de ce compte utilisateur, y compris les informations personnelles, le rôle et les groupes.
+		</p>
 
-	<!-- Popup de succès -->
-	{#if showSuccessPopup}
-		<div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-			<div class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
-				Modification effectuée avec succès !
+		<!-- Popup de succès -->
+		{#if showSuccessPopup}
+			<div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+				<div class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg">
+					Modification effectuée avec succès !
+				</div>
 			</div>
-		</div>
-	{/if}
+		{/if}
 
-	<div class="space-y-6 bg-white p-6 rounded-lg shadow-md">
-		<div class="grid grid-cols-2 gap-6">
-			<div>
-				<label for="nom" class="block text-gray-700 font-bold mb-2">Nom</label>
-				<input
-					id="nom"
-					type="text"
-					bind:value={utilisateur.nom}
-					class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
-				/>
-			</div>
-			<div>
-				<label for="prenom" class="block text-gray-700 font-bold mb-2">Prénom</label>
-				<input
-					id="prenom"
-					type="text"
-					bind:value={utilisateur.prenom}
-					class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
-				/>
-			</div>
-		</div>
-
-		<div>
-			<label for="email" class="block text-gray-700 font-bold mb-2">E-mail</label>
-			<input
-				id="email"
-				type="email"
-				bind:value={utilisateur.email}
-				class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
-			/>
-		</div>
-
-		<div>
-			<label for="promotion" class="block text-gray-700 font-bold mb-2">Promotion</label>
-			<select
-				id="promotion"
-				bind:value={utilisateur.promotion}
-				class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+		<!-- Message contextuel -->
+		{#if message}
+			<div
+				class="fixed bottom-6 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg text-white font-semibold transition-all duration-500 ease-in-out z-50"
+				class:bg-green-500={messageType === 'success'}
+				class:bg-red-500={messageType === 'error'}
+				style="opacity: 1; animation: smooth-slide-up-and-fade 3.5s ease-in-out forwards;"
 			>
-				<option value="" disabled>Choisir une promotion</option>
-				{#each Object.values(EPromotion) as promotion}
-					<option value={promotion}>{promotion}</option>
-				{/each}
-			</select>
-		</div>
-
-		<div>
-			<label class="block text-gray-700 font-bold mb-2">Rôles de l'utilisateur</label>
-			<div class="flex flex-wrap gap-4">
-				{#each Object.values(ERoleUtilisateur).filter(role => role !== 'PROFESSEUR') as role}
-					<label class="flex items-center space-x-2">
-						<input
-							type="radio"
-							name="role"
-							value={role}
-							bind:group={utilisateur.role}
-							class="form-radio text-purple-500 focus:ring-purple-500"
-						/>
-						<span class="text-gray-700">{role}</span>
-					</label>
-				{/each}
+				{message}
 			</div>
-		</div>
+		{/if}
 
-		<div class="grid grid-cols-2 gap-6">
+		<div class="space-y-6 bg-white p-6 rounded-lg shadow-md">
+			<div class="grid grid-cols-2 gap-6">
+				<div>
+					<label for="nom" class="block text-gray-700 font-bold mb-2">Nom</label>
+					<input
+						id="nom"
+						type="text"
+						bind:value={utilisateur.nom}
+						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+					/>
+				</div>
+				<div>
+					<label for="prenom" class="block text-gray-700 font-bold mb-2">Prénom</label>
+					<input
+						id="prenom"
+						type="text"
+						bind:value={utilisateur.prenom}
+						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+					/>
+				</div>
+			</div>
+
 			<div>
-				<label for="groupeTD" class="block text-gray-700 font-bold mb-2">Groupe TD</label>
+				<label for="email" class="block text-gray-700 font-bold mb-2">E-mail</label>
+				<input
+					id="email"
+					type="email"
+					bind:value={utilisateur.email}
+					class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+				/>
+			</div>
+
+			<div>
+				<label for="promotion" class="block text-gray-700 font-bold mb-2">Promotion</label>
 				<select
-					id="groupeTD"
-					bind:value={utilisateur.groupeTD}
-					onchange={() => mettreAJourGroupesTP(utilisateur.groupeTD)}
+					id="promotion"
+					bind:value={utilisateur.promotion}
 					class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
 				>
-					<option value="" disabled>Choisir un groupe TD</option>
-					{#each groupesTD as groupe}
-						<option value={groupe}>{groupe}</option>
+					<option value="" disabled>Choisir une promotion</option>
+					{#each Object.values(EPromotion) as promotion}
+						<option value={promotion}>{promotion}</option>
 					{/each}
 				</select>
 			</div>
-			<div>
-				<label for="groupeTP" class="block text-gray-700 font-bold mb-2">Groupe TP</label>
-				<select
-					id="groupeTP"
-					bind:value={utilisateur.groupeTP}
-					class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
-				>
-					<option value="" disabled>Choisir un groupe TP</option>
-					{#each groupesTP as groupe}
-						<option value={groupe}>{groupe}</option>
-					{/each}
-				</select>
-			</div>
-		</div>
 
-		<div class="mt-6 flex justify-between items-center">
-			<div class="flex space-x-4">
-				<button
-					class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-semibold"
-					onclick={() => goto('/menu-admin')}
-				>
-					Annuler
-				</button>
-				<button
-					class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 font-semibold"
-					onclick={sauvegarderUtilisateur}
-				>
-					Enregistrer
-				</button>
+			<div>
+				<label class="block text-gray-700 font-bold mb-2">Rôles de l'utilisateur</label>
+				<div class="flex flex-wrap gap-4">
+					{#each Object.values(ERoleUtilisateur).filter(role => role !== 'PROFESSEUR') as role}
+						<label class="flex items-center space-x-2">
+							<input
+								type="radio"
+								name="role"
+								value={role}
+								bind:group={utilisateur.role}
+								class="form-radio text-purple-500 focus:ring-purple-500"
+							/>
+							<span class="text-gray-700">{role}</span>
+						</label>
+					{/each}
+				</div>
+			</div>
+
+			<div class="grid grid-cols-2 gap-6">
+				<div>
+					<label for="groupeTD" class="block text-gray-700 font-bold mb-2">Groupe TD</label>
+					<select
+						id="groupeTD"
+						bind:value={utilisateur.groupeTD}
+						onchange={() => mettreAJourGroupesTP(utilisateur.groupeTD)}
+						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+					>
+						<option value="" disabled>Choisir un groupe TD</option>
+						{#each groupesTD as groupe}
+							<option value={groupe}>{groupe}</option>
+						{/each}
+					</select>
+				</div>
+				<div>
+					<label for="groupeTP" class="block text-gray-700 font-bold mb-2">Groupe TP</label>
+					<select
+						id="groupeTP"
+						bind:value={utilisateur.groupeTP}
+						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+					>
+						<option value="" disabled>Choisir un groupe TP</option>
+						{#each groupesTP as groupe}
+							<option value={groupe}>{groupe}</option>
+						{/each}
+					</select>
+				</div>
+			</div>
+
+			<div class="mt-6 flex justify-between items-center">
+				<div class="flex space-x-4">
+					<button
+						class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-semibold"
+						onclick={() => goto('/menu-admin')}
+					>
+						Annuler
+					</button>
+					<button
+						class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 font-semibold"
+						onclick={sauvegarderUtilisateur}
+					>
+						Enregistrer
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
+{/if}
+
+<style>
+	/* Animation fluide pour l'apparition et la disparition */
+	@keyframes smooth-slide-up-and-fade {
+		0% {
+			opacity: 0;
+			transform: translate(-50%, 30px); /* Décalage initial */
+		}
+		15% {
+			opacity: 1;
+			transform: translate(-50%, 0); /* Centré */
+		}
+		85% {
+			opacity: 1;
+			transform: translate(-50%, 0); /* Maintien */
+		}
+		100% {
+			opacity: 0;
+			transform: translate(-50%, 30px); /* Disparition */
+		}
+	}
+</style>

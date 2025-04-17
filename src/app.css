@@ -15,3 +15,26 @@ nav {
 	/* ...existing code... */
 	position: relative;
 }
+
+/* Assurez-vous que toutes les icônes héritent des styles globaux */
+[class^="i-ph:"],
+[class*=" i-ph:"] {
+	display: inline-block;
+	vertical-align: middle;
+	font-size: 1.25rem; /* Taille par défaut */
+	color: inherit; /* Hérite de la couleur du texte environnant */
+}
+
+.i-ph\:user-circle,
+.i-ph\:lock {
+	font-size: 1.25rem; /* Taille des icônes */
+	color: inherit; /* Hérite de la couleur du texte environnant */
+}
+
+a {
+	transition: color 0.3s ease;
+}
+
+a:hover {
+	text-decoration: underline;
+}
