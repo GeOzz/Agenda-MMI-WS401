@@ -206,7 +206,7 @@
 					class:input-error={utilisateurForm.mot_de_passe.length > 0 && utilisateurForm.confirmation_mot_de_passe.length > 0 && utilisateurForm.mot_de_passe !== utilisateurForm.confirmation_mot_de_passe}
 					class:input-success={utilisateurForm.mot_de_passe.length >= 8 && utilisateurForm.mot_de_passe === utilisateurForm.confirmation_mot_de_passe}
 				/>
-				<label for="mot_de_passe" class="absolute left-4 top-2 text-gray-500 text-sm peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 transition-all">
+				<label for="mot_de_passe" class="absolute left-4 top-2 text-sm peer-placeholder-shown:top-4 peer-placeholder-shown:text-base transition-all">
 					Mot de passe
 				</label>
 				{#if erreurs.mot_de_passe}
@@ -224,7 +224,7 @@
 					class:input-error={utilisateurForm.mot_de_passe.length > 0 && utilisateurForm.confirmation_mot_de_passe.length > 0 && utilisateurForm.mot_de_passe !== utilisateurForm.confirmation_mot_de_passe}
 					class:input-success={utilisateurForm.mot_de_passe.length >= 8 && utilisateurForm.mot_de_passe === utilisateurForm.confirmation_mot_de_passe}
 				/>
-				<label for="confirmation_mot_de_passe" class="absolute left-4 top-2 text-gray-500 text-sm peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 transition-all">
+				<label for="confirmation_mot_de_passe" class="absolute left-4 top-2 text-sm peer-placeholder-shown:top-4 peer-placeholder-shown:text-base transition-all">
 					Confirmez le mot de passe
 				</label>
 				{#if erreurs.confirmation_mot_de_passe}
