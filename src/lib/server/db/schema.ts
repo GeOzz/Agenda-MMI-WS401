@@ -38,3 +38,9 @@ export const votes_devoir = sqliteTable('votes_devoir', {
 	vote: integer('vote'),
 	timestamp: integer('timestamp')
 });
+
+export const historique = sqliteTable('historique', {
+	id: integer('id').primaryKey(),
+	json: text('json'),
+	timestamp: integer('timestamp')
+});

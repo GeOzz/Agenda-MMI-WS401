@@ -310,7 +310,7 @@
 										editor.chain().focus().toggleHeading({ level }).run();
 									}
 								}}
-								class="p-1.5 rounded-md border border-gray-300 text-sm"
+								class="p-1.5 pr-8 rounded-md border border-gray-300 text-sm"
 							>
 								<option value="paragraph" selected={editor.isActive('paragraph')}>Paragraph</option>
 								<option value="heading-1" selected={editor.isActive('heading', { level: 1 })}
@@ -382,30 +382,7 @@
 									></path></svg
 								>
 							</button>
-							<button
-								type="button"
-								onclick={() => editor.chain().focus().toggleBlockquote().run()}
-								class={`p-1.5 rounded-md hover:bg-gray-100 ${editor.isActive('blockquote') ? 'bg-purple-100 text-purple-800' : 'text-gray-700'}`}
-								aria-label="Blockquote"
-								title="Blockquote"
-							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="16"
-									height="16"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									><path
-										d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2 1 0 1 0 1 1v1c0 1-1 2-2 2s-1 .008-1 1.031V20c0 1 0 1 1 1z"
-									></path><path
-										d="M15 21c3 0 7-1 7-8V5c0-1.25-.757-2.017-2-2h-4c-1.25 0-2 .75-2 1.972V11c0 1.25.75 2 2 2h.75c0 2.25.25 4-2.75 4v3c0 1 0 1 1 1z"
-									></path></svg
-								>
-							</button>
+
 							<button
 								type="button"
 								onclick={() => editor.chain().focus().toggleCodeBlock().run()}
@@ -430,53 +407,6 @@
 						</div>
 
 						<div class="h-8 w-px bg-gray-200 mx-1"></div>
-
-						<div class="flex items-center space-x-1">
-							<button
-								type="button"
-								onclick={() => editor.chain().focus().undo().run()}
-								disabled={!editor.can().chain().focus().undo().run()}
-								class="p-1.5 rounded-md hover:bg-gray-100 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-								aria-label="Undo"
-								title="Undo"
-							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="16"
-									height="16"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"
-									></path></svg
-								>
-							</button>
-							<button
-								type="button"
-								onclick={() => editor.chain().focus().redo().run()}
-								disabled={!editor.can().chain().focus().redo().run()}
-								class="p-1.5 rounded-md hover:bg-gray-100 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-								aria-label="Redo"
-								title="Redo"
-							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="16"
-									height="16"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									><path d="M21 7v6h-6"></path><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"
-									></path></svg
-								>
-							</button>
-						</div>
 
 						<div class="relative ml-auto">
 							<button

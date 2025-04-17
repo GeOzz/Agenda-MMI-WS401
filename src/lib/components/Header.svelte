@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { ERoleUtilisateur } from '$lib/interfaces/IUtilisateur';
 	import { deconnexion, STORE } from '$lib/store.svelte';
 
 	let menuOuvert = false;
@@ -56,7 +57,11 @@
 				<!-- Boutons ajoutés -->
 				<a href="/mes-devoirs" class="flex items-center text-white hover:text-[#FDB813] gap-2">
 					<span class="w-6 h-6 i-ph:book-light"></span>
-					<span>Mes Devoirs</span>
+					<span
+						>{STORE.utilisateur?.role === ERoleUtilisateur.PROFESSEUR
+							? 'Les Devoirs'
+							: 'Mes Devoirs'}</span
+					>
 				</a>
 				<a href="/ajouter-devoir" class="flex items-center text-white hover:text-[#FDB813] gap-2">
 					<span class="w-6 h-6 i-ph:plus-circle-light"></span>
@@ -83,8 +88,12 @@
 							id="userMenu"
 							class="absolute right-0 mt-2 w-full md:w-48 bg-white shadow-lg py-1 text-gray-700 rounded-sm z-50"
 						>
-							{#if STORE.utilisateur?.role === 'PROFESSEUR'}
-								<a href="/menu-admin" class="block px-4 py-3 hover:bg-gray-100" onclick={fermerMenu}>
+							{#if STORE.utilisateur?.role === ERoleUtilisateur.PROFESSEUR}
+								<a
+									href="/menu-admin"
+									class="block px-4 py-3 hover:bg-gray-100"
+									onclick={fermerMenu}
+								>
 									Menu Admin
 								</a>
 								<hr class="my-1" />

@@ -76,90 +76,116 @@
 		<form class="space-y-6" onsubmit={handleSubmit}>
 			<!-- Nom et Prénom -->
 			<div class="grid grid-cols-2 gap-4">
-				<div>
-					<label for="nom" class="block text-sm text-gray-600 mb-1">Nom *</label>
+				<div class="relative">
 					<input
 						type="text"
 						id="nom"
 						required
 						bind:value={nom}
-						class="w-full px-3 py-2 border border-gray-300 rounded-md"
-						placeholder="Albert"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md pt-5 pb-2 focus:outline-none focus:ring-2 focus:ring-[#4B3B7C] peer"
+						placeholder=" "
 					/>
+					<label
+						for="nom"
+						class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-3 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
+					>
+						Nom
+					</label>
 				</div>
-				<div>
-					<label for="prenom" class="block text-sm text-gray-600 mb-1">Prenom *</label>
+				<div class="relative">
 					<input
 						type="text"
 						id="prenom"
 						required
 						bind:value={prenom}
-						class="w-full px-3 py-2 border border-gray-300 rounded-md"
-						placeholder="Mark"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md pt-5 pb-2 focus:outline-none focus:ring-2 focus:ring-[#4B3B7C] peer"
+						placeholder=" "
 					/>
+					<label
+						for="prenom"
+						class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-3 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
+					>
+						Prénom
+					</label>
 				</div>
 			</div>
 
 			<!-- Email -->
-			<div>
-				<label for="email" class="block text-sm text-gray-600 mb-1">E-mail *</label>
+			<div class="relative">
 				<input
 					type="email"
 					id="email"
 					required
 					bind:value={email}
-					class="w-full px-3 py-2 border border-gray-300 rounded-md"
-					placeholder="etudiant@univ-reims.fr"
+					class="w-full px-3 py-2 border border-gray-300 rounded-md pt-5 pb-2 focus:outline-none focus:ring-2 focus:ring-[#4B3B7C] peer"
+					placeholder=" "
 				/>
+				<label
+					for="email"
+					class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-3 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
+				>
+					E-mail
+				</label>
 			</div>
 
 			<!-- mot_de_passe -->
-			<div>
-				<label for="password" class="block text-sm text-gray-600 mb-1">Mot de passe *</label>
-
+			<div class="relative">
 				<input
 					type="password"
 					id="mot_de_passe"
 					required
 					bind:value={mot_de_passe}
-					class="w-full px-3 py-2 border border-gray-300 rounded-md"
-					placeholder="**********"
+					class="w-full px-3 py-2 border border-gray-300 rounded-md pt-5 pb-2 focus:outline-none focus:ring-2 focus:ring-[#4B3B7C] peer"
+					placeholder=" "
 				/>
+				<label
+					for="mot_de_passe"
+					class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-3 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
+				>
+					Mot de passe
+				</label>
 			</div>
 			<!-- mot_de_passe_confirmation -->
-			<div>
-				<label for="password" class="block text-sm text-gray-600 mb-1"
-					>Confirmation du mot de passe *</label
-				>
+			<div class="relative">
 				<input
 					type="password"
 					id="mot_de_passe_confirmation"
 					required
 					bind:value={mot_de_passe_confirmation}
-					class="w-full px-3 py-2 border border-gray-300 rounded-md"
-					placeholder="**********"
+					class="w-full px-3 py-2 border border-gray-300 rounded-md pt-5 pb-2 focus:outline-none focus:ring-2 focus:ring-[#4B3B7C] peer"
+					placeholder=" "
 				/>
+				<label
+					for="mot_de_passe_confirmation"
+					class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-3 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
+				>
+					Confirmation du mot de passe
+				</label>
 			</div>
 
 			<!-- Promotion -->
-			<div>
-				<label for="promotion" class="block text-sm text-gray-600 mb-1">Promotion</label>
+			<div class="relative">
 				<select
 					id="promotion"
 					required
 					bind:value={promotion}
-					class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white"
+					class="w-full px-3 py-2 border border-gray-300 rounded-md pt-5 pb-2 focus:outline-none focus:ring-2 focus:ring-[#4B3B7C] peer bg-white"
 				>
 					{#each Object.values(EPromotion) as promotion}
 						<option>{promotion}</option>
 					{/each}
 				</select>
+				<label
+					for="promotion"
+					class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-3 peer-focus:scale-75 peer-focus:-translate-y-4"
+				>
+					Promotion
+				</label>
 			</div>
 
 			<!-- Groupes -->
 			<div class="grid grid-cols-2 gap-4">
-				<div>
-					<label for="groupeTD" class="block text-sm text-gray-600 mb-1">Groupe (TD) </label>
+				<div class="relative">
 					<select
 						required
 						id="groupeTD"
@@ -167,7 +193,7 @@
 							groupeTP = FILTERED_GROUPES_TP[0];
 						}}
 						bind:value={groupeTD}
-						class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md pt-5 pb-2 focus:outline-none focus:ring-2 focus:ring-[#4B3B7C] peer bg-white"
 					>
 						{#each Object.values(EGroupeTD) as _groupeTD}
 							<option value={_groupeTD} selected={_groupeTD === groupeTD}>
@@ -175,14 +201,19 @@
 							</option>
 						{/each}
 					</select>
+					<label
+						for="groupeTD"
+						class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-3 peer-focus:scale-75 peer-focus:-translate-y-4"
+					>
+						Groupe (TD)
+					</label>
 				</div>
-				<div>
-					<label for="groupeTP" class="block text-sm text-gray-600 mb-1">Groupe (TP)</label>
+				<div class="relative">
 					<select
 						required
 						id="groupeTP"
 						bind:value={groupeTP}
-						class="w-full px-3 py-2 border border-gray-300 rounded-md bg-white"
+						class="w-full px-3 py-2 border border-gray-300 rounded-md pt-5 pb-2 focus:outline-none focus:ring-2 focus:ring-[#4B3B7C] peer bg-white"
 					>
 						{#each FILTERED_GROUPES_TP as _groupeTP}
 							<option value={_groupeTP} selected={_groupeTP === groupeTP}>
@@ -190,6 +221,12 @@
 							</option>
 						{/each}
 					</select>
+					<label
+						for="groupeTP"
+						class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-3 peer-focus:scale-75 peer-focus:-translate-y-4"
+					>
+						Groupe (TP)
+					</label>
 				</div>
 			</div>
 

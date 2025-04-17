@@ -15,29 +15,39 @@
 
 		<form class="space-y-6" on:submit|preventDefault={handleSubmit}>
 			<!-- Email -->
-			<div>
-				<label for="email" class="block text-sm text-gray-600 mb-1">E-mail</label>
+			<div class="relative">
 				<input
 					type="email"
 					id="email"
 					required
 					bind:value={email}
-					class="w-full px-3 py-2 border border-gray-300 rounded-md"
-					placeholder="etudiant@univ-reims.fr"
+					class="w-full px-3 py-2 border border-gray-300 rounded-md pt-5 pb-2 focus:outline-none focus:ring-2 focus:ring-[#4B3B7C] peer"
+					placeholder=" "
 				/>
+				<label
+					for="email"
+					class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-3 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
+				>
+					E-mail
+				</label>
 			</div>
 
 			<!-- Mot de passe -->
-			<div>
-				<label for="mot_de_passe" class="block text-sm text-gray-600 mb-1">Mot de passe</label>
+			<div class="relative">
 				<input
 					type="password"
 					id="mot_de_passe"
 					required
 					bind:value={mot_de_passe}
-					class="w-full px-3 py-2 border border-gray-300 rounded-md"
-					placeholder="**********"
+					class="w-full px-3 py-2 border border-gray-300 rounded-md pt-5 pb-2 focus:outline-none focus:ring-2 focus:ring-[#4B3B7C] peer"
+					placeholder=" "
 				/>
+				<label
+					for="mot_de_passe"
+					class="absolute text-sm text-gray-500 duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-3 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4"
+				>
+					Mot de passe
+				</label>
 			</div>
 
 			<div class="flex items-center justify-between pt-4">

@@ -92,6 +92,52 @@
 		<div class="flex justify-center items-center h-64">
 			<div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gray-900"></div>
 		</div>
+	{:else if error === 'Erreur lors de la récupération du devoir: Forbidden'}
+		<div class="bg-red-50 border-l-4 border-red-400 p-6 rounded-lg shadow-md max-w-3xl mx-auto">
+			<div class="flex items-center mb-4">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					class="h-10 w-10 text-red-500 mr-4"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke="currentColor"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="2"
+						d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"
+					/>
+				</svg>
+				<h2 class="text-2xl font-bold text-gray-800">Accès restreint</h2>
+			</div>
+
+			<p class="text-gray-700 mb-4">
+				Vous n'avez pas les autorisations nécessaires pour accéder à ce devoir. Cela peut être dû à
+				l'une des raisons suivantes :
+			</p>
+
+			<ul class="list-disc list-inside text-gray-700 mb-6 ml-4 space-y-2">
+				<li>Ce devoir n'est pas destiné à votre promotion ou groupe</li>
+				<li>Vous n'êtes pas connecté avec le bon compte</li>
+				<li>Le devoir a été supprimé ou déplacé</li>
+			</ul>
+
+			<div class="flex flex-col sm:flex-row gap-4 mt-6">
+				<a
+					href="/"
+					class="bg-[#705B97] hover:bg-[#4D3677] text-white font-medium py-2 px-4 rounded-lg transition duration-200 text-center"
+				>
+					Retourner à l'accueil
+				</a>
+				<a
+					href="/mes-devoirs"
+					class="bg-white hover:bg-gray-100 text-gray-800 font-medium py-2 px-4 rounded-lg border border-gray-300 transition duration-200 text-center"
+				>
+					Voir mes devoirs
+				</a>
+			</div>
+		</div>
 	{:else if error}
 		<div
 			class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
@@ -155,9 +201,14 @@
 				<div class="relative">
 					<div class="w-full h-40 bg-[#4D3677]">
 						<div class="flex justify-center items-center h-full w-full">
-							<h1 class="text-2xl font-bold text-white inline">
-								{MATIERES.find((_matiere) => _matiere.id === devoir.matiere)?.nom}
-							</h1>
+							<div>
+								<h1 class="text-md font-regular text-white block text-center">
+									{MATIERES.find((_matiere) => _matiere.id === devoir.matiere)?.nom}
+								</h1>
+								<h2 class="text-xl font-bold text-white block text-center">
+									{devoir.titre}
+								</h2>
+							</div>
 						</div>
 					</div>
 					<div class="absolute top-0 right-0 bg-white px-3 py-1 m-4 rounded-lg shadow">
@@ -179,6 +230,10 @@
 						<div class="text-sm text-gray-600 mb-2">
 							<span class="font-semibold">Promotion:</span>
 							{devoir.promotion}
+						</div>
+						<div class="text-sm text-gray-600 mb-2">
+							<span class="font-semibold">Groupes:</span>
+							{devoir.groupes}
 						</div>
 						{#if devoir.timestamp}
 							<div class="text-sm text-gray-600">

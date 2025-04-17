@@ -5,6 +5,7 @@ import { devoirs, utilisateurs } from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { ERoleUtilisateur } from '$lib/interfaces/IUtilisateur';
+import { AjouterHistorique } from '$lib/server/historique';
 
 export const GET: RequestHandler = async ({ request, params }) => {
 	const COOKIE = request.headers.get('Cookie');
@@ -84,7 +85,7 @@ export const PUT: RequestHandler = async ({ request, params }) => {
 	const { titre, matiere, promotion, expire_le_timestamp, groupes, markdown } =
 		await request.json();
 
-	await db
+	const NOUVEAU_DEVOIR = await db
 		.update(devoirs)
 		.set({
 			titre,
@@ -94,8 +95,15 @@ export const PUT: RequestHandler = async ({ request, params }) => {
 			groupes,
 			markdown
 		})
-		.where(eq(devoirs.id, Number(params.id)));
-
+		.where(eq(devoirs.id, Number(params.id)))
+		.returning();
+	AjouterHistorique({
+		utilisateur: UTILISATEUR,
+		devoir: NOUVEAU_DEVOIR[0],
+		action: 'update',
+		type: 'devoir',
+		timestamp: new Date().getTime()
+	});
 	return new Response('Devoir modifié avec succès', { status: 200 });
 };
 
@@ -127,6 +135,12 @@ export const DELETE: RequestHandler = async ({ request, params }) => {
 	}
 
 	await db.delete(devoirs).where(eq(devoirs.id, Number(params.id)));
-
+	AjouterHistorique({
+		utilisateur: UTILISATEUR,
+		devoir: DEVOIR,
+		action: 'delete',
+		type: 'devoir',
+		timestamp: new Date().getTime()
+	});
 	return new Response('Devoir supprimé avec succès', { status: 200 });
 };

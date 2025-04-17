@@ -5,6 +5,7 @@ import { STORE } from '$lib/store.svelte';
 import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 import { ERoleUtilisateur } from '$lib/interfaces/IUtilisateur';
+import { AjouterHistorique } from '$lib/server/historique';
 
 export const GET: RequestHandler = async ({ request }) => {
 	const COOKIE = request.headers.get('Cookie');
@@ -64,20 +65,32 @@ export const POST: RequestHandler = async ({ request }) => {
 		return new Response('Session invalide', { status: 401 });
 	}
 
+	const UTILISATEUR = await db.query.utilisateurs.findFirst({
+		where: eq(utilisateurs.id, SESSION_VALIDE.id_utilisateur)
+	});
+
 	const { promotion, matiere, expire_le_timestamp, groupes, markdown, titre } =
 		await request.json();
-
-	const DEVOID_DB = await db.insert(devoirs).values({
-		promotion,
-		matiere,
-		expire_le_timestamp,
-		groupes,
-		markdown,
-		utilisateur_id_createur: SESSION_VALIDE.id_utilisateur,
-		titre,
+	console.log(promotion, matiere, expire_le_timestamp, groupes, markdown, titre);
+	const DEVOIR = await db
+		.insert(devoirs)
+		.values({
+			promotion,
+			matiere,
+			expire_le_timestamp,
+			groupes,
+			markdown,
+			utilisateur_id_createur: SESSION_VALIDE.id_utilisateur,
+			titre,
+			timestamp: new Date().getTime()
+		})
+		.returning();
+	AjouterHistorique({
+		utilisateur: UTILISATEUR,
+		devoir: DEVOIR[0],
+		action: 'create',
+		type: 'devoir',
 		timestamp: new Date().getTime()
 	});
-	return new Response(
-		JSON.stringify({ message: 'Devoir ajouté avec succès', id: DEVOID_DB.lastInsertRowid })
-	);
+	return new Response(JSON.stringify({ message: 'Devoir ajouté avec succès', id: DEVOIR[0].id }));
 };

@@ -65,6 +65,11 @@
 			window.localStorage.setItem('devoirs_deja_fait', JSON.stringify([devoir_id]));
 		}
 	}
+	async function RecupereHistorique() {
+		const response = await fetch('/api/historique');
+		const historique = await response.json();
+		return historique;
+	}
 </script>
 
 {#await AfficherOuNon then value}
@@ -75,12 +80,110 @@
 				class="w-64 h-screen bg-gray-100 text-black flex flex-col fixed left-0 overflow-y-auto shadow-lg"
 			>
 				<div class="p-4">
-					<h2 class="text-2xl font-bold">Action</h2>
-					<!-- Titre ajouté -->
+					<h2 class="text-2xl font-bold">Historique</h2>
+					<div class="mt-4 space-y-2">
+						{#await RecupereHistorique() then historique}
+							{#if historique && historique.length > 0}
+								<div class="space-y-3">
+									{#each historique.slice(0, 5) as item}
+										{#if item.json}
+											{@const histItem = JSON.parse(item.json)}
+											<div
+												class="p-3 bg-white rounded-lg shadow-sm border border-gray-200 text-sm hover:shadow-md transition-shadow duration-200"
+											>
+												<div class="flex flex-wrap justify-between items-center gap-1">
+													<span class="font-semibold inline-flex items-center">
+														{#if histItem.action === 'create'}
+															<span class="inline-block w-2 h-2 rounded-full bg-green-500 mr-2"
+															></span>
+															Création
+														{:else if histItem.action === 'update'}
+															<span class="inline-block w-2 h-2 rounded-full bg-blue-500 mr-2"
+															></span>
+															Modification
+														{:else if histItem.action === 'delete'}
+															<span class="inline-block w-2 h-2 rounded-full bg-red-500 mr-2"
+															></span>
+															Suppression
+														{:else}
+															{histItem.action}
+														{/if}
+													</span>
+													<span class="text-xs text-gray-500 whitespace-nowrap">
+														{new Date(histItem.timestamp).toLocaleString('fr-FR')}
+													</span>
+												</div>
+												<div class="mt-2 text-gray-700 text-sm">
+													<span class="font-bold"
+														>{histItem.utilisateur?.nom} {histItem.utilisateur?.prenom}</span
+													>
+													a
+													{histItem.action === 'create'
+														? 'créé'
+														: histItem.action === 'update'
+															? 'modifié'
+															: histItem.action === 'delete'
+																? 'supprimé'
+																: histItem.action}
+													{histItem.type === 'devoir' ? 'un devoir' : histItem.type}
+													{#if histItem.devoir?.titre}
+														: <a
+															href={`/devoir/${histItem.devoir.id}`}
+															class="font-bold text-[#705B97]">{histItem.devoir.titre}</a
+														>
+													{/if}
+												</div>
+											</div>
+										{/if}
+									{/each}
+								</div>
+							{:else}
+								<div
+									class="p-4 bg-white rounded-lg shadow-sm border border-gray-200 flex items-center justify-center"
+								>
+									<p class="text-gray-500 italic flex items-center">
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											class="h-5 w-5 mr-2 text-gray-400"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke="currentColor"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												stroke-width="2"
+												d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+											/>
+										</svg>
+										Aucun historique disponible.
+									</p>
+								</div>
+							{/if}
+						{:catch error}
+							<div class="p-4 bg-red-100 rounded-lg border border-red-300 flex items-center">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									class="h-5 w-5 mr-2 text-red-500"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										stroke-width="2"
+										d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+									/>
+								</svg>
+								<p class="text-red-700">
+									Erreur lors du chargement de l'historique: {error.message}
+								</p>
+							</div>
+						{/await}
+					</div>
 				</div>
-				<ul class="flex-1 p-4 space-y-4">
-
-				</ul>
+				<ul class="flex-1 p-4 space-y-4"></ul>
 				<div class="p-4 mt-auto">
 					<button
 						class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition duration-150 ease-in-out"
@@ -91,7 +194,7 @@
 			</nav>
 
 			<!-- Contenu principal -->
-			<div class="flex-1 ml-64 max-w-7xl mx-auto p-8 mt-6 bg-white">
+			<div class="flex-1 ml-64 mx-auto p-8 mt-6 bg-white">
 				{#if STORE.utilisateur?.role === ERoleUtilisateur.PROFESSEUR}
 					<h1 class="text-4xl font-bold mb-10">
 						Bienvenue {STORE.utilisateur?.nom}, il y a {DEVOIRS.length} devoirs en ligne.
@@ -146,24 +249,26 @@
 										class="px-4 py-2 bg-[#705B97] bg-opacity-60 text-[#3B2A5B] font-bold rounded-md hover:bg-opacity-40 transition duration-150 ease-in-out"
 										>Voir plus</button
 									>
-									<div class="flex space-x-2">
-										<button
-											on:click={() => handleAFaire(devoir?.id)}
-											class="px-4 py-2 bg-[#F7B000] text-[#3B2A5B] font-bold rounded-md hover:bg-[#D69A00] transition duration-150 ease-in-out {!devoirs_deja_fait?.includes(
-												devoir?.id
-											)
-												? 'opacity-50'
-												: ''}">À faire</button
-										>
-										<button
-											on:click={() => handleDejaFait(devoir?.id)}
-											class="px-4 py-2 bg-[#DDD4EC] text-[#3B2A5B] font-bold rounded-md transition duration-150 ease-in-out {devoirs_deja_fait?.includes(
-												devoir?.id
-											)
-												? 'opacity-50'
-												: ''}">Déjà fait</button
-										>
-									</div>
+									{#if STORE.utilisateur?.role !== ERoleUtilisateur.PROFESSEUR}
+										<div class="flex space-x-2">
+											<button
+												on:click={() => handleAFaire(devoir?.id)}
+												class="px-4 py-2 bg-[#F7B000] text-[#3B2A5B] font-bold rounded-md hover:bg-[#D69A00] transition duration-150 ease-in-out {!devoirs_deja_fait?.includes(
+													devoir?.id
+												)
+													? 'opacity-50'
+													: ''}">À faire</button
+											>
+											<button
+												on:click={() => handleDejaFait(devoir?.id)}
+												class="px-4 py-2 bg-[#DDD4EC] text-[#3B2A5B] font-bold rounded-md transition duration-150 ease-in-out {devoirs_deja_fait?.includes(
+													devoir?.id
+												)
+													? 'opacity-50'
+													: ''}">Déjà fait</button
+											>
+										</div>
+									{/if}
 								</div>
 							</div>
 						</div>
