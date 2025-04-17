@@ -560,10 +560,12 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 			</button>
 			<button
 				type="submit"
-				class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+				class="px-4 py-2 text-white rounded-md hover:brightness-110"
+				style="background-color: #4B3B7C"
 			>
 				Ajouter
 			</button>
+
 		</div>
 	</form>
 </div>

@@ -108,11 +108,13 @@
 
 		<div class="mt-6 flex justify-end">
 			<button
-				class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 font-semibold"
+				class="px-4 py-2 text-white rounded-md hover:brightness-110 font-semibold"
+				style="background-color: #4B3B7C"
 				onclick={changerMotDePasse}
 			>
 				Enregistrer
 			</button>
+
 		</div>
 	</div>
 

@@ -142,11 +142,13 @@
 			{#if utilisateur.role === 'PROFESSEUR'}
 			<div class="mt-10 mb-6 flex justify-end">
 				<button
-					class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 font-semibold"
+					class="px-4 py-2 text-white rounded-md hover:brightness-110 font-semibold"
+					style="background-color: #4B3B7C"
 					onclick={allerAjouterUtilisateur}
 				>
-					Ajouter un utilisateur
+				Ajouter un utilisateur
 				</button>
+
 			</div>
 		{/if}
 
