@@ -9,8 +9,10 @@
 
 	onMount(async () => {
 		const response = await fetch('/api/devoirs');
-
 		devoirs = await response.json();
+
+		// Trier les devoirs par date de rendu (les plus proches en premier)
+		devoirs.sort((a, b) => a.expire_le_timestamp - b.expire_le_timestamp);
 
 		INTERVAL = setInterval(() => {
 			devoirs = devoirs
@@ -59,6 +61,12 @@
 		}
 	}
 
+	async function RecupereHistorique() {
+		const response = await fetch('/api/historique');
+		const historique = await response.json();
+		return historique;
+	}
+
 	function getTimeRemaining(expire_le_timestamp: number) {
 		const total = expire_le_timestamp - Date.now();
 		const days = Math.floor(total / (1000 * 60 * 60 * 24));
@@ -66,11 +74,6 @@
 		const minutes = Math.floor((total / (1000 * 60)) % 60);
 		const seconds = Math.floor((total / 1000) % 60);
 		return { total, days, hours, minutes, seconds };
-	}
-	async function RecupereHistorique() {
-		const response = await fetch('/api/historique');
-		const historique = await response.json();
-		return historique;
 	}
 </script>
 
@@ -85,7 +88,7 @@
 				{#await RecupereHistorique() then historique}
 					{#if historique && historique.length > 0}
 						<div class="space-y-3">
-							{#each historique.slice(0, 5) as item}
+							{#each historique as item}
 								{#if item.json}
 									{@const histItem = JSON.parse(item.json)}
 									<div
@@ -178,14 +181,6 @@
 					</div>
 				{/await}
 			</div>
-		</div>
-		<ul class="flex-1 p-4 space-y-4"></ul>
-		<div class="p-4 mt-auto">
-			<button
-				class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 transition duration-150 ease-in-out"
-				>Mode sombre</button
-			>
-			<!-- Bouton ajouté -->
 		</div>
 	</nav>
 
