@@ -76,13 +76,12 @@
 
 <div class="flex">
 	<!-- Menu de navigation à gauche -->
-	<!-- Menu de navigation à gauche -->
 	<nav
 		class="w-64 h-screen bg-gray-100 text-black flex flex-col fixed left-0 overflow-y-auto shadow-lg"
 	>
 		<div class="p-4">
 			<h2 class="text-2xl font-bold">Historique</h2>
-			<div class="mt-4 space-y-2">
+			<div class="mt-4 space-y-2 overflow-y-auto max-h-[calc(100vh-8rem)]">
 				{#await RecupereHistorique() then historique}
 					{#if historique && historique.length > 0}
 						<div class="space-y-3">
@@ -191,8 +190,9 @@
 	</nav>
 
 	{#if devoirs.length === 0}
-		<div class="flex-1 ml-64 mx-auto p-6 mt-6 bg-white">
-			<p class="text-gray-900 text-sm font-bold">Aucun devoir trouvé</p>
+		<div class="flex-1 ml-64 mx-auto p-6 mt-6 bg-white flex flex-col items-center justify-center">
+			<img src="/empty.svg" alt="Aucun devoir" class="w-40 h-40 mb-4 opacity-75" />
+			<p class="text-gray-500 text-lg font-semibold">Aucun devoir trouvé pour le moment.</p>
 		</div>
 	{:else}
 		<!-- Contenu principal -->
@@ -253,3 +253,40 @@
 		</div>
 	{/if}
 </div>
+
+<style>
+	:global(body) {
+		@apply bg-gray-100;
+	}
+	/* Ajout d'une animation pour les cartes */
+	.bg-white {
+		transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+	}
+	.bg-white:hover {
+		transform: translateY(-5px);
+		box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+	}
+	nav {
+		overflow-y: auto; /* Permet le défilement vertical */
+		height: 100%; /* Assure que le menu occupe toute la hauteur */
+	}
+	/* Ajout d'un style pour permettre le défilement dans la section historique */
+	nav .overflow-y-auto {
+		scrollbar-width: thin; /* Pour les navigateurs compatibles */
+		scrollbar-color: #705B97 #f7fafc; /* Couleurs personnalisées */
+	}
+
+	nav .overflow-y-auto::-webkit-scrollbar {
+		width: 8px; /* Largeur de la barre de défilement */
+	}
+
+	nav .overflow-y-auto::-webkit-scrollbar-thumb {
+		background-color: #705B97; /* Couleur violette */
+		border-radius: 4px; /* Coins arrondis */
+	}
+
+	nav .overflow-y-auto::-webkit-scrollbar-track {
+		background-color: #f7fafc; /* Couleur de l'arrière-plan */
+	}
+</style>
+

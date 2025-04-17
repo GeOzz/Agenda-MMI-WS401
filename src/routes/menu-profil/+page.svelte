@@ -4,7 +4,7 @@
 	import { STORE } from '$lib/store.svelte'; // Importez le STORE pour mettre à jour les données utilisateur
 
 	let utilisateur = {
-		id: null, // Ajoutez l'ID ici pour éviter les erreurs
+		id: null,
 		nom: '',
 		prenom: '',
 		email: '',
@@ -14,6 +14,7 @@
 		promotion: ''
 	};
 
+	let utilisateurInitial = { ...utilisateur }; // Stocker les données initiales
 	let message = '';
 	let messageType = ''; // 'success' ou 'error'
 
@@ -25,14 +26,31 @@
 		}, 3000); // Le message disparaît après 3 secondes
 	}
 
-	// Charger les données utilisateur depuis `$page.data`
+	// Charger les données utilisateur depuis le serveur
+	async function chargerUtilisateurDepuisServeur() {
+		try {
+			const response = await fetch('/api/mon-compte');
+			if (response.ok) {
+				const data = await response.json();
+				utilisateur = data;
+				utilisateurInitial = { ...data }; // Sauvegarder les données initiales
+				STORE.utilisateur = data; // Mettre à jour le STORE
+			} else {
+				console.error('Erreur lors du chargement des données utilisateur:', await response.text());
+			}
+		} catch (error) {
+			console.error('Erreur réseau lors du chargement des données utilisateur:', error);
+		}
+	}
+
 	onMount(() => {
-		utilisateur = $page.data.utilisateur;
+		chargerUtilisateurDepuisServeur(); // Recharger les données utilisateur à chaque visite
 	});
 
 	async function sauvegarderProfil() {
 		if (utilisateur.nom.length < 3 || utilisateur.prenom.length < 3) {
 			afficherMessage('error', 'Le nom et le prénom doivent contenir au moins 3 caractères.');
+			utilisateur = { ...utilisateurInitial }; // Restaurer les données initiales
 			return;
 		}
 
@@ -61,14 +79,17 @@
 				afficherMessage('success', 'Profil mis à jour avec succès.');
 				// Mettez à jour le STORE pour refléter les modifications dans le menu
 				STORE.utilisateur = { ...STORE.utilisateur, ...utilisateur };
+				utilisateurInitial = { ...utilisateur }; // Mettre à jour les données initiales
 			} else {
 				const errorText = await response.text();
 				console.error('Erreur lors de la mise à jour du profil:', errorText);
 				afficherMessage('error', 'Erreur lors de la mise à jour du profil.');
+				utilisateur = { ...utilisateurInitial }; // Restaurer les données initiales
 			}
 		} catch (error) {
 			console.error('Erreur réseau:', error);
 			afficherMessage('error', 'Erreur réseau lors de la mise à jour du profil.');
+			utilisateur = { ...utilisateurInitial }; // Restaurer les données initiales
 		}
 	}
 </script>
@@ -98,31 +119,37 @@
 
 		<div class="space-y-6 bg-white p-6 rounded-lg shadow-md">
 			<div class="grid grid-cols-2 gap-6">
-				<div>
-					<label class="block text-gray-700 font-bold mb-2">Nom</label>
+				<div class="relative">
 					<input
+						id="nom"
 						type="text"
 						bind:value={utilisateur.nom}
-						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+						class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+						placeholder=" "
 					/>
+					<label for="nom">Nom</label>
 				</div>
-				<div>
-					<label class="block text-gray-700 font-bold mb-2">Prénom</label>
+				<div class="relative">
 					<input
+						id="prenom"
 						type="text"
 						bind:value={utilisateur.prenom}
-						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+						class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+						placeholder=" "
 					/>
+					<label for="prenom">Prénom</label>
 				</div>
 			</div>
 
-			<div>
-				<label class="block text-gray-700 font-bold mb-2">E-mail</label>
+			<div class="relative">
 				<input
+					id="email"
 					type="email"
 					bind:value={utilisateur.email}
-					class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+					class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+					placeholder=" "
 				/>
+				<label for="email">E-mail</label>
 			</div>
 
 			<!-- Les champs suivants sont désactivés pour les étudiants -->
@@ -258,5 +285,29 @@
 	.initial-hidden {
 		opacity: 0;
 		transform: translate(-50%, 30px);
+	}
+
+	/* Styles pour les labels flottants */
+	.relative input {
+		padding-top: 1.25rem; /* Ajout d'espace pour le label flottant */
+	}
+
+	.relative label {
+		position: absolute;
+		left: 1rem;
+		top: 1.25rem;
+		font-size: 1rem;
+		color: #6b7280; /* Couleur grise */
+		transition: all 0.2s ease-in-out;
+	}
+
+	.relative input:focus + label,
+	.relative input:not(:placeholder-shown) + label {
+		top: -0.5rem; /* Position plus haute */
+		left: 0.75rem; /* Ajustement horizontal */
+		font-size: 0.875rem; /* Réduction de la taille */
+		color: #4b3b7c; /* Couleur violette */
+		background-color: white; /* Fond blanc pour éviter le chevauchement */
+		padding: 0 0.25rem; /* Ajout de padding pour le fond blanc */
 	}
 </style>

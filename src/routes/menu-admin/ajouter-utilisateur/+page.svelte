@@ -303,15 +303,23 @@
 				</div>
 			</div>
 
-			<div class="mt-6 flex justify-end">
+            <div class="mt-6 flex justify-between items-center"> 
+                <div class="flex space-x-4">
+                <button
+                class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-semibold"
+                onclick={() => goto('/menu-admin')}
+            >
+                Annuler
+            </button>
 				<button
 					class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 font-semibold"
 					onclick={ajouterUtilisateur}
 				>
 					Enregistrer
 				</button>
-			</div>
+            </div>
 		</div>
+	</div>
 	</div>
 
 	<!-- Message contextuel -->

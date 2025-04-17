@@ -160,116 +160,119 @@
 
 		<div class="space-y-6 bg-white p-6 rounded-lg shadow-md">
 			<div class="grid grid-cols-2 gap-6">
-				<div>
-					<label for="nom" class="block text-gray-700 font-bold mb-2">Nom</label>
+					<div class="relative">
+						<input
+							id="nom"
+							type="text"
+							bind:value={utilisateur.nom}
+							class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+							placeholder=" "
+						/>
+						<label for="nom">Nom</label>
+					</div>
+					<div class="relative">
+						<input
+							id="prenom"
+							type="text"
+							bind:value={utilisateur.prenom}
+							class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+							placeholder=" "
+						/>
+						<label for="prenom">Prénom</label>
+					</div>
+				</div>
+
+				<div class="relative">
 					<input
-						id="nom"
-						type="text"
-						bind:value={utilisateur.nom}
-						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+						id="email"
+						type="email"
+						bind:value={utilisateur.email}
+						class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+						placeholder=" "
 					/>
+					<label for="email">E-mail</label>
 				</div>
-				<div>
-					<label for="prenom" class="block text-gray-700 font-bold mb-2">Prénom</label>
-					<input
-						id="prenom"
-						type="text"
-						bind:value={utilisateur.prenom}
-						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
-					/>
-				</div>
-			</div>
 
-			<div>
-				<label for="email" class="block text-gray-700 font-bold mb-2">E-mail</label>
-				<input
-					id="email"
-					type="email"
-					bind:value={utilisateur.email}
-					class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
-				/>
-			</div>
-
-			<div>
-				<label for="promotion" class="block text-gray-700 font-bold mb-2">Promotion</label>
-				<select
-					id="promotion"
-					bind:value={utilisateur.promotion}
-					class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
-				>
-					<option value="" disabled>Choisir une promotion</option>
-					{#each Object.values(EPromotion) as promotion}
-						<option value={promotion}>{promotion}</option>
-					{/each}
-				</select>
-			</div>
-
-			<div>
-				<label class="block text-gray-700 font-bold mb-2">Rôles de l'utilisateur</label>
-				<div class="flex flex-wrap gap-4">
-					{#each Object.values(ERoleUtilisateur).filter(role => role !== 'PROFESSEUR') as role}
-						<label class="flex items-center space-x-2">
-							<input
-								type="radio"
-								name="role"
-								value={role}
-								bind:group={utilisateur.role}
-								class="form-radio text-purple-500 focus:ring-purple-500"
-							/>
-							<span class="text-gray-700">{role}</span>
-						</label>
-					{/each}
-				</div>
-			</div>
-
-			<div class="grid grid-cols-2 gap-6">
-				<div>
-					<label for="groupeTD" class="block text-gray-700 font-bold mb-2">Groupe TD</label>
+				<div class="relative">
 					<select
-						id="groupeTD"
-						bind:value={utilisateur.groupeTD}
-						onchange={() => mettreAJourGroupesTP(utilisateur.groupeTD)}
-						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+						id="promotion"
+						bind:value={utilisateur.promotion}
+						class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
 					>
-						<option value="" disabled>Choisir un groupe TD</option>
-						{#each groupesTD as groupe}
-							<option value={groupe}>{groupe}</option>
+						<option value="" disabled>Choisir une promotion</option>
+						{#each Object.values(EPromotion) as promotion}
+							<option value={promotion}>{promotion}</option>
 						{/each}
 					</select>
+					<label for="promotion">Promotion</label>
 				</div>
-				<div>
-					<label for="groupeTP" class="block text-gray-700 font-bold mb-2">Groupe TP</label>
-					<select
-						id="groupeTP"
-						bind:value={utilisateur.groupeTP}
-						class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
-					>
-						<option value="" disabled>Choisir un groupe TP</option>
-						{#each groupesTP as groupe}
-							<option value={groupe}>{groupe}</option>
-						{/each}
-					</select>
-				</div>
-			</div>
 
-			<div class="mt-6 flex justify-between items-center">
-				<div class="flex space-x-4">
-					<button
-						class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-semibold"
-						onclick={() => goto('/menu-admin')}
-					>
-						Annuler
-					</button>
-					<button
-						class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 font-semibold"
-						onclick={sauvegarderUtilisateur}
-					>
-						Enregistrer
-					</button>
+				<div class="relative">
+					<label class="block text-gray-700 font-bold mb-2">Rôles de l'utilisateur</label>
+					<div class="flex flex-wrap gap-4">
+						{#each Object.values(ERoleUtilisateur).filter(role => role !== 'PROFESSEUR') as role}
+							<label class="flex items-center space-x-2">
+								<input
+									type="radio"
+									name="role"
+									value={role}
+									bind:group={utilisateur.role}
+									class="form-radio text-purple-500 focus:ring-purple-500"
+								/>
+								<span class="text-gray-700">{role}</span>
+							</label>
+						{/each}
+					</div>
+				</div>
+
+				<div class="grid grid-cols-2 gap-6">
+					<div class="relative">
+						<select
+							id="groupeTD"
+							bind:value={utilisateur.groupeTD}
+							onchange={() => mettreAJourGroupesTP(utilisateur.groupeTD)}
+							class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+						>
+							<option value="" disabled>Choisir un groupe TD</option>
+							{#each groupesTD as groupe}
+								<option value={groupe}>{groupe}</option>
+							{/each}
+						</select>
+						<label for="groupeTD">Groupe TD</label>
+					</div>
+					<div class="relative">
+						<select
+							id="groupeTP"
+							bind:value={utilisateur.groupeTP}
+							class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+						>
+							<option value="" disabled>Choisir un groupe TP</option>
+							{#each groupesTP as groupe}
+								<option value={groupe}>{groupe}</option>
+							{/each}
+						</select>
+						<label for="groupeTP">Groupe TP</label>
+					</div>
+				</div>
+
+				<div class="mt-6 flex justify-between items-center">
+					<div class="flex space-x-4">
+						<button
+							class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-semibold"
+							onclick={() => goto('/menu-admin')}
+						>
+							Annuler
+						</button>
+						<button
+							class="px-4 py-2 bg-purple-500 text-white rounded-md hover:bg-purple-600 font-semibold"
+							onclick={sauvegarderUtilisateur}
+						>
+							Enregistrer
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
 {/if}
 
 <style>
@@ -291,5 +294,32 @@
 			opacity: 0;
 			transform: translate(-50%, 30px); /* Disparition */
 		}
+	}
+
+	/* Styles pour les labels flottants */
+	.relative input,
+	.relative select {
+		padding-top: 1.25rem; /* Ajout d'espace pour le label flottant */
+	}
+
+	.relative label {
+		position: absolute;
+		left: 1rem;
+		top: 1.25rem;
+		font-size: 1rem;
+		color: #6b7280; /* Couleur grise */
+		transition: all 0.2s ease-in-out;
+	}
+
+	.relative input:focus + label,
+	.relative input:not(:placeholder-shown) + label,
+	.relative select:focus + label,
+	.relative select:not([value=""]) + label {
+		top: -0.5rem; /* Position plus haute */
+		left: 0.75rem; /* Ajustement horizontal */
+		font-size: 0.875rem; /* Réduction de la taille */
+		color: #4b3b7c; /* Couleur violette */
+		background-color: white; /* Fond blanc pour éviter le chevauchement */
+		padding: 0 0.25rem; /* Ajout de padding pour le fond blanc */
 	}
 </style>
