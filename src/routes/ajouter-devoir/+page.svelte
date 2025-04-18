@@ -24,6 +24,70 @@
 	let element;
 	let editor = $state<Editor | null>(null);
 
+	let devoirForm = {
+		titre: '',
+		description: '',
+		dateRendu: '',
+		promotion: '',
+		groupes: []
+	};
+
+	let erreurs = {
+		titre: '',
+		description: '',
+		dateRendu: '',
+		promotion: '',
+		groupes: ''
+	};
+
+	const groupesOptions = ['TD AB', 'TD CD', 'TD EF', 'TD GH', 'TD IJ'];
+
+	function validerChamps() {
+		erreurs = {
+			titre: devoirForm.titre.length < 3 ? '' : '',
+			description: devoirForm.description.length < 10 ? '' : '',
+			dateRendu: devoirForm.dateRendu === '' ? '' : '',
+			promotion: devoirForm.promotion === '' ? '' : '',
+			groupes: devoirForm.groupes.length === 0 ? '' : ''
+		};
+
+		return Object.values(erreurs).every((erreur) => erreur === '');
+	}
+
+	async function ajouterDevoir() {
+		if (!validerChamps()) {
+			return;
+		}
+
+		try {
+			const response = await fetch('/api/ajouter-devoir', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(devoirForm)
+			});
+
+			if (response.ok) {
+				alert('Devoir ajouté avec succès.');
+				// Réinitialiser le formulaire
+				devoirForm = {
+					titre: '',
+					description: '',
+					dateRendu: '',
+					promotion: '',
+					groupes: []
+					};
+				selectedTD = '';
+				groupesTP = [];
+			} else {
+				alert('Erreur lors de l\'ajout du devoir.');
+			}
+		} catch (error) {
+			alert('Erreur réseau lors de l\'ajout du devoir.');
+		}
+	}
+
 	onMount(() => {
 		editor = new Editor({
 			element: element,
@@ -143,6 +207,20 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 			.filter((matiere) => matiere.id !== '1')
 			.sort((a, b) => parseInt(String(a.id).slice(2, 5)) - parseInt(String(b.id).slice(2, 5)));
 	});
+
+	const groupesTD = ['TD AB', 'TD CD', 'TD EF', 'TD GH', 'TD IJ'];
+	let groupesTP = [];
+	let selectedTD = '';
+
+	function mettreAJourGroupesTP(td: string) {
+		if (td === 'TD AB') groupesTP = ['TP A', 'TP B'];
+		else if (td === 'TD CD') groupesTP = ['TP C', 'TP D'];
+		else if (td === 'TD EF') groupesTP = ['TP E', 'TP F'];
+		else if (td === 'TD GH') groupesTP = ['TP G', 'TP H'];
+		else if (td === 'TD IJ') groupesTP = ['TP I', 'TP J'];
+		else groupesTP = [];
+		devoirForm.groupes = []; // Réinitialiser les groupes sélectionnés
+	}
 </script>
 
 <div class="max-w-4xl mx-auto p-6 prose">
@@ -202,7 +280,7 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 				type="datetime-local"
 				bind:value={expire_le_timestamp}
 				class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-			/>
+					/>
 		</div>
 
 		<div>
@@ -269,7 +347,7 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 				required
 				bind:value={titre}
 				class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-			/>
+					/>
 		</div>
 
 		<div class="border border-gray-300 bg-white rounded-md p-4 min-h-[300px]">
@@ -297,8 +375,8 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 									stroke-width="2"
 									stroke-linecap="round"
 									stroke-linejoin="round"
-									><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"></path><path
-										d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"
+									><path d="M6 4h8a4 4 0 0 1 4 4 4 0 0 1-4 4H6z"></path><path
+										d="M6 12h9a4 4 0 0 1 4 4 4 0 0 1-4 4H6z"
 									></path></svg
 								>
 							</button>
@@ -569,3 +647,35 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 		</div>
 	</form>
 </div>
+
+<style>
+	/* Styles pour les labels flottants */
+	.relative input,
+	.relative select,
+	.relative textarea {
+		padding-top: 1.25rem; /* Ajout d'espace pour le label flottant */
+	}
+
+	.relative label {
+		position: absolute;
+		left: 1rem;
+		top: 1.25rem;
+		font-size: 1rem;
+		color: #6b7280; /* Couleur grise */
+		transition: all 0.2s ease-in-out;
+	}
+
+	.relative input:focus + label,
+	.relative input:not(:placeholder-shown) + label,
+	.relative select:focus + label,
+	.relative select:not([value=""]) + label,
+	.relative textarea:focus + label,
+	.relative textarea:not(:placeholder-shown) + label {
+		top: -0.5rem; /* Position plus haute */
+		left: 0.75rem; /* Ajustement horizontal */
+		font-size: 0.875rem; /* Réduction de la taille */
+		color: #4b3b7c; /* Couleur violette */
+		background-color: white; /* Fond blanc pour éviter le chevauchement */
+		padding: 0 0.25rem; /* Ajout de padding pour le fond blanc */
+	}
+</style>
