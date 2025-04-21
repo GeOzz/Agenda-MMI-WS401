@@ -98,6 +98,21 @@
 			</div>
 		</div>
 
+					<!-- Bouton pour ajouter un utilisateur (visible uniquement pour les professeurs) -->
+					{#if utilisateur.role === 'PROFESSEUR'}
+					<div class="mt-10 mb-6 flex justify-end">
+						
+						<button
+							class="px-4 py-2 text-white rounded-md hover:brightness-110 font-semibold"
+							style="background-color: #4B3B7C"
+							onclick={allerAjouterUtilisateur}
+						>
+						Ajouter un utilisateur
+						</button>
+		
+					</div>
+					{/if}
+
 		<table class="w-full border-collapse bg-white shadow-md rounded-lg overflow-hidden">
 			<thead class="bg-purple-100 text-gray-800">
 				<tr>
@@ -137,20 +152,6 @@
 				{/each}
 			</tbody>
 		</table>
-
-			<!-- Bouton pour ajouter un utilisateur (visible uniquement pour les professeurs) -->
-			{#if utilisateur.role === 'PROFESSEUR'}
-			<div class="mt-10 mb-6 flex justify-end">
-				<button
-					class="px-4 py-2 text-white rounded-md hover:brightness-110 font-semibold"
-					style="background-color: #4B3B7C"
-					onclick={allerAjouterUtilisateur}
-				>
-				Ajouter un utilisateur
-				</button>
-
-			</div>
-		{/if}
 
 		<div class="flex justify-between items-center mt-6">
 			{#if nombreDePages > 1}
