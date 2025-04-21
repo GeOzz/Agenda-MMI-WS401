@@ -99,16 +99,16 @@
 	<div class="w-1/4 bg-white shadow-md p-6 rounded-lg fixed h-full">
 		<h2 class="text-xl font-bold text-gray-800 mb-4">Navigation</h2>
 		<ul class="space-y-4">
-			<li class="flex items-center space-x-3 hover:bg-gray-100 p-2 rounded-md transition">
-				<span class="i-ph:user-circle text-purple-600 text-lg"></span>
-				<a href="/menu-profil" class="text-purple-600 font-semibold hover:underline">Détail du profil</a>
+			<li class="flex items-center space-x-3 hover:bg-[#EEEAF9] p-2 rounded-md transition">
+				<span class="i-ph:user-circle text-[#4B3B7C] text-lg"></span>
+				<a href="/menu-profil" class="text-[#4B3B7C] font-semibold hover:underline hover:text-[#4B3B7C]">Détail du profil</a>
 			</li>
-			<li class="flex items-center space-x-3 hover:bg-gray-100 p-2 rounded-md transition">
+			<li class="flex items-center space-x-3 hover:bg-[#EEEAF9] p-2 rounded-md transition">
 				<span class="i-ph:lock text-gray-600 text-lg"></span>
-				<a href="/menu-profil/acces-securite" class="text-gray-600 hover:text-purple-600 hover:underline">Accès et Sécurité</a>
+				<a href="/menu-profil/acces-securite" class="text-gray-600 hover:text-[#4B3B7C] hover:underline">Accès et Sécurité</a>
 			</li>
 		</ul>
-	</div>
+	</div>	
 
 	<!-- Contenu principal -->
 	<div class="w-3/4 p-8 ml-1/4">
