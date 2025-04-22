@@ -33,8 +33,7 @@ export const GET: RequestHandler = async ({ request }) => {
 			GROUPES?.includes(UTILISATEUR?.groupeTD!) || GROUPES?.includes(UTILISATEUR?.groupeTP!);
 		const PROMOTION_INCLUE = UTILISATEUR?.promotion === devoir.promotion;
 		const ADMIN =
-			UTILISATEUR?.role === ERoleUtilisateur.PROFESSEUR ||
-			UTILISATEUR?.role === ERoleUtilisateur.DELEGUE;
+			UTILISATEUR?.role === ERoleUtilisateur.PROFESSEUR;
 
 		const PEUT_CONSULTER = ADMIN || (!ADMIN && DEVOIR_DANS_MES_GROUPES && PROMOTION_INCLUE);
 

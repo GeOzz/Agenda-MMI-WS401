@@ -185,9 +185,25 @@
 	</nav>
 
 	{#if devoirs.length === 0}
-		<div class="flex-1 ml-64 mx-auto p-6 mt-6 bg-white flex flex-col items-center justify-center">
-			<img src="/empty.svg" alt="Aucun devoir" class="w-40 h-40 mb-4 opacity-75" />
-			<p class="text-gray-500 text-lg font-semibold">Aucun devoir trouvé pour le moment.</p>
+		<div class="flex-1 ml-64 mx-auto p-10 mt-10 flex flex-col items-center justify-center">
+			<!-- Nouveau SVG friendly -->
+			<svg width="220" height="220" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg" class="mb-6">
+				<circle cx="110" cy="110" r="100" fill="#FDEFCC"/>
+				<ellipse cx="110" cy="170" rx="60" ry="18" fill="#DBD7E3"/>
+				<rect x="60" y="80" width="100" height="60" rx="18" fill="#fff" stroke="#705B97" stroke-width="3"/>
+				<rect x="75" y="95" width="70" height="10" rx="5" fill="#DBD7E3"/>
+				<rect x="75" y="112" width="40" height="8" rx="4" fill="#FDEFCC"/>
+				<circle cx="150" cy="116" r="6" fill="#DBD7E3"/>
+				<path d="M90 150 Q110 160 130 150" stroke="#705B97" stroke-width="3" fill="none"/>
+			</svg>
+			<h2 class="text-2xl font-bold text-gray-700 mb-2">Aucun devoir à venir !</h2>
+			<p class="text-gray-500 text-base mb-6 text-center max-w-md">
+				Vous êtes à jour dans vos devoirs. Profitez-en pour vous reposer ou anticiper vos prochaines tâches !
+			</p>
+			<a href="/" class="inline-flex items-center px-5 gap-2 py-3 bg-[#705B97] text-white rounded-lg shadow hover:bg-[#4B3B7C] transition-colors font-semibold">
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256"><path fill="currentColor" d="M224 120v96a8 8 0 0 1-8 8h-56a8 8 0 0 1-8-8v-52a4 4 0 0 0-4-4h-40a4 4 0 0 0-4 4v52a8 8 0 0 1-8 8H40a8 8 0 0 1-8-8v-96a16 16 0 0 1 4.69-11.31l80-80a16 16 0 0 1 22.62 0l80 80A16 16 0 0 1 224 120"/></svg>
+				Retour à l'accueil
+			</a> 
 		</div>
 	{:else}
 		<!-- Contenu principal -->

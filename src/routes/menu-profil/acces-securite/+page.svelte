@@ -3,24 +3,39 @@
 	let nouveauMotDePasse = '';
 	let confirmationNouveauMotDePasse = '';
 
-	let motDePasseValide = true;
 	let message = '';
-	let messageType = ''; // 'success' ou 'error'
+	let messageType = '';
+
+	let erreurs = {
+		motDePasse: '',
+		nouveauMotDePasse: '',
+		confirmationNouveauMotDePasse: ''
+	};
 
 	function afficherMessage(type: string, texte: string) {
 		messageType = type;
 		message = texte;
 		setTimeout(() => {
 			message = '';
-		}, 3000); // Le message disparaît après 3 secondes
+		}, 3000);
+	}
+
+	function validerChamps() {
+		erreurs = { motDePasse: '', nouveauMotDePasse: '', confirmationNouveauMotDePasse: '' };
+		if (!motDePasse) {
+			erreurs.motDePasse = 'Le mot de passe actuel est requis.';
+		}
+		if (!nouveauMotDePasse || nouveauMotDePasse.length < 8) {
+			erreurs.nouveauMotDePasse = 'Le nouveau mot de passe doit contenir au moins 8 caractères.';
+		}
+		if (nouveauMotDePasse !== confirmationNouveauMotDePasse) {
+			erreurs.confirmationNouveauMotDePasse = 'Les mots de passe ne correspondent pas.';
+		}
+		return Object.values(erreurs).every((v) => v === '');
 	}
 
 	async function changerMotDePasse() {
-		if (!motDePasseValide) {
-			afficherMessage('error', 'Les mots de passe ne correspondent pas ou sont trop courts.');
-			return;
-		}
-
+		if (!validerChamps()) return;
 		try {
 			const response = await fetch('/api/changerMotDePasse', {
 				method: 'POST',
@@ -29,17 +44,18 @@
 				},
 				body: JSON.stringify({
 					mot_de_passe_actuel: motDePasse,
-					mot_de_passe_nouveau: nouveauMotDePasse
+					mot_de_passe_nouveau: nouveauMotDePasse,
+					mot_de_passe_confirmation: confirmationNouveauMotDePasse,
 				})
-			});
-
+				});
 			if (response.ok) {
 				afficherMessage('success', 'Mot de passe mis à jour avec succès.');
 				motDePasse = '';
 				nouveauMotDePasse = '';
 				confirmationNouveauMotDePasse = '';
 			} else {
-				afficherMessage('error', 'Erreur lors de la mise à jour du mot de passe.');
+				const err = await response.text();
+				afficherMessage('error', err || 'Erreur lors de la mise à jour du mot de passe.');
 			}
 		} catch (error) {
 			afficherMessage('error', 'Erreur réseau lors de la mise à jour du mot de passe.');
@@ -72,50 +88,59 @@
 		</p>
 
 		<div class="space-y-6 bg-white p-6 rounded-lg shadow-md">
-			<div>
-				<label for="motDePasse" class="block text-gray-700 font-bold mb-2"
-					>Mot de passe actuel</label
-				>
+				<div class="relative">
 				<input
 					id="motDePasse"
 					type="password"
 					bind:value={motDePasse}
-					class="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+					required
+					class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 placeholder-transparent"
+					placeholder=" "
 				/>
+				<label for="motDePasse">Mot de passe actuel</label>
+				{#if erreurs.motDePasse}
+					<p class="text-red-500 text-sm mt-1 font-medium">{erreurs.motDePasse}</p>
+				{/if}
 			</div>
-			<div>
-				<label for="motDePasse" class="block text-gray-700 font-bold mb-2"
-					>Nouveau mot de passe</label
-				>
+			<div class="relative">
 				<input
 					id="nouveauMotDePasse"
 					type="password"
 					bind:value={nouveauMotDePasse}
-					class="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+					required
+					class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 placeholder-transparent"
+					placeholder=" "
 				/>
+				<label for="nouveauMotDePasse">Nouveau mot de passe</label>
+				{#if erreurs.nouveauMotDePasse}
+					<p class="text-red-500 text-sm mt-1 font-medium">{erreurs.nouveauMotDePasse}</p>
+				{/if}
 			</div>
-			<div>
-				<label for="confirmationMotDePasse" class="block text-gray-700 font-bold mb-2"
-					>Confirmez le nouveau mot de passe</label
-				>
+			<div class="relative">
 				<input
 					id="confirmationNouveauMotDePasse"
 					type="password"
 					bind:value={confirmationNouveauMotDePasse}
-					class="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+					required
+					class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 placeholder-transparent"
+					placeholder=" "
 				/>
+				<label for="confirmationNouveauMotDePasse">Confirmez le nouveau mot de passe</label>
+				{#if erreurs.confirmationNouveauMotDePasse}
+					<p class="text-red-500 text-sm mt-1 font-medium">{erreurs.confirmationNouveauMotDePasse}</p>
+				{/if}
 			</div>
 		</div>
 
 		<div class="mt-6 flex justify-end">
 			<button
+				type="button"
 				class="px-4 py-2 text-white rounded-md hover:brightness-110 font-semibold"
 				style="background-color: #4B3B7C"
-				onclick={changerMotDePasse}
+				on:click={changerMotDePasse}
 			>
 				Enregistrer
 			</button>
-
 		</div>
 	</div>
 
@@ -133,6 +158,27 @@
 </div>
 
 <style>
+	.relative input {
+		padding-top: 1.25rem;
+	}
+	.relative label {
+		position: absolute;
+		left: 1rem;
+		top: 1.25rem;
+		font-size: 1rem;
+		color: #6b7280;
+		transition: all 0.2s ease-in-out;
+		pointer-events: none;
+	}
+	.relative input:focus + label,
+	.relative input:not(:placeholder-shown) + label {
+		top: -0.5rem;
+		left: 0.75rem;
+		font-size: 0.875rem;
+		color: #4b3b7c;
+		background-color: white;
+		padding: 0 0.25rem;
+	}
 	/* Ajout d'une animation pour les alertes */
 	.fixed {
 		animation: slide-up 0.5s ease-in-out;

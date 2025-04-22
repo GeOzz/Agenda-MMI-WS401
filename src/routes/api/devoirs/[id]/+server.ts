@@ -42,8 +42,7 @@ export const GET: RequestHandler = async ({ request, params }) => {
 			.map((groupe) => groupe.trim())
 			?.includes(UTILISATEUR?.groupeTP!);
 	const ADMIN =
-		UTILISATEUR?.role === ERoleUtilisateur.PROFESSEUR ||
-		UTILISATEUR?.role === ERoleUtilisateur.DELEGUE;
+		UTILISATEUR?.role === ERoleUtilisateur.PROFESSEUR;
 
 	const PEUT_CONSULTER = ADMIN || (!ADMIN && DEVOIR_DANS_MES_GROUPES && PROMOTION_INCLUE);
 

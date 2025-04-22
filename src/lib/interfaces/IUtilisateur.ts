@@ -155,9 +155,9 @@ export enum EGroupeTP {
 }
 
 export enum ERoleUtilisateur {
-	ETUDIANT = 'ETUDIANT',
 	DELEGUE = 'DELEGUE',
-	PROFESSEUR = 'PROFESSEUR'
+	PROFESSEUR = 'PROFESSEUR',
+	ETUDIANT = 'ETUDIANT',
 }
 
 export enum EPermissions {

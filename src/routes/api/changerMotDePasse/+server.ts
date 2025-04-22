@@ -21,12 +21,16 @@ export const POST: RequestHandler = async ({ request }) => {
 	}
 
 	try {
-		const { mot_de_passe_actuel, mot_de_passe_nouveau } = await request.json();
+		const { mot_de_passe_actuel, mot_de_passe_nouveau, mot_de_passe_confirmation } = await request.json();
 
-		if (!mot_de_passe_actuel || !mot_de_passe_nouveau) {
+		if (!mot_de_passe_actuel || !mot_de_passe_nouveau || !mot_de_passe_confirmation) {
 			return new Response('Mot de passe incorrect', { status: 400 });
 		}
 
+		if (mot_de_passe_nouveau !== mot_de_passe_confirmation) {
+			return new Response('La confirmation du mot de passe ne correspond pas', { status: 400 });
+		}
+ 
 		const UTILISATEUR = await db.query.utilisateurs.findFirst({
 			where: eq(utilisateurs.id, SESSION_VALIDE.id_utilisateur!)
 		});

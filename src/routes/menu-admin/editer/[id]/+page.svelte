@@ -200,18 +200,6 @@
 					<label for="email">E-mail</label>
 				</div>
 
-				<div class="flex gap-6 items-center mt-4 mb-4">
-					<label class="block text-sm font-medium text-gray-700">Rôle</label>
-					<label class="flex items-center gap-2">
-						<input type="radio" name="role" value="ÉTUDIANT" bind:group={utilisateur.role} />
-						<span>ÉTUDIANT</span>
-					</label>
-					<label class="flex items-center gap-2">
-						<input type="radio" name="role" value="DÉLÉGUÉ" bind:group={utilisateur.role} />
-						<span>DÉLÉGUÉ</span>
-					</label>
-				</div>
-
 				<div class="relative">
 					<select
 						id="promotion"
@@ -254,6 +242,18 @@
 						</select>
 						<label for="groupeTP">Groupe TP</label>
 					</div>
+				</div>
+
+				<div class="flex gap-6 items-center mt-4 mb-4">
+					<label class="block text-sm font-medium text-gray-700">Rôle</label>
+					<label class="flex items-center gap-2">
+						<input type="radio" name="role" value={ERoleUtilisateur.ETUDIANT} bind:group={utilisateur.role} />
+						<span>ÉTUDIANT</span>
+					</label>
+					<label class="flex items-center gap-2">
+						<input type="radio" name="role" value={ERoleUtilisateur.DELEGUE} bind:group={utilisateur.role} />
+						<span>DÉLÉGUÉ</span>
+					</label>
 				</div>
 
 				<div class="mt-6 flex justify-between items-center">
