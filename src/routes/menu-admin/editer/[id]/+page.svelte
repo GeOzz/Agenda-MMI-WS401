@@ -38,7 +38,14 @@
 			const response = await fetch(`/api/utilisateur/${id}`);
 			if (response.ok) {
 				utilisateur = await response.json();
-				mettreAJourGroupesTP(utilisateur.groupeTD); // Mettre à jour les TP après le chargement
+				mettreAJourGroupesTP(utilisateur.groupeTD);
+				if (!utilisateur.role) {
+					utilisateur.role = "ÉTUDIANT";
+					// Après avoir chargé l'utilisateur, forcer la valeur du rôle si besoin
+					if (!['ÉTUDIANT', 'DÉLÉGUÉ'].includes(utilisateur.role)) {
+						utilisateur.role = 'ÉTUDIANT';
+					}
+				}
 			} else {
 				erreur = { status: response.status, message: "Erreur lors du chargement des données utilisateur." };
 			}
@@ -193,6 +200,23 @@
 					<label for="email">E-mail</label>
 				</div>
 
+				<div class="flex gap-6 items-center mt-4 mb-4">
+					<label class="block text-sm font-medium text-gray-700">Rôle</label>
+					<label class="flex items-center gap-2">
+						<input type="radio" name="role" value="ÉTUDIANT" bind:group={utilisateur.role} />
+						<span>ÉTUDIANT</span>
+					</label>
+					<label class="flex items-center gap-2">
+						<input type="radio" name="role" value="DÉLÉGUÉ" bind:group={utilisateur.role} />
+						<span>DÉLÉGUÉ</span>
+					</label>
+					<!-- Ajout d'une option pour le rôle PROFESSEUR -->
+					<label class="flex items-center gap-2">
+						<input type="radio" name="role" value="PROFESSEUR" bind:group={utilisateur.role} />
+						<span>PROFESSEUR</span>
+					</label>
+				</div>
+
 				<div class="relative">
 					<select
 						id="promotion"
@@ -205,24 +229,6 @@
 						{/each}
 					</select>
 					<label for="promotion">Promotion</label>
-				</div>
-
-				<div class="relative">
-					<label class="block text-gray-700 font-bold mb-2">Rôles de l'utilisateur</label>
-					<div class="flex flex-wrap gap-4">
-						{#each Object.values(ERoleUtilisateur).filter(role => role !== 'PROFESSEUR') as role}
-							<label class="flex items-center space-x-2">
-								<input
-									type="radio"
-									name="role"
-									value={role}
-									bind:group={utilisateur.role}
-									class="form-radio text-purple-500 focus:ring-purple-500"
-								/>
-								<span class="text-gray-700">{role}</span>
-							</label>
-						{/each}
-					</div>
 				</div>
 
 				<div class="grid grid-cols-2 gap-6">

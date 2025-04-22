@@ -12,7 +12,19 @@
 
 	const matieres_options = Object.values(MATIERES);
 
-	let expire_le_timestamp = $state(new Date());
+	// Fonction utilitaire pour formater la date au format 'YYYY-MM-DDTHH:mm'
+	function formatDateTimeLocal(date) {
+		if (!date) return '';
+		const d = new Date(date);
+		const year = d.getFullYear();
+		const month = String(d.getMonth() + 1).padStart(2, '0');
+		const day = String(d.getDate()).padStart(2, '0');
+		const hours = String(d.getHours()).padStart(2, '0');
+		const minutes = String(d.getMinutes()).padStart(2, '0');
+		return `${year}-${month}-${day}T${hours}:${minutes}`;
+	}
+
+	let expire_le_timestamp = $state('');
 	let groupes = $state([]);
 	let selectedGroupe = $state('');
 	const groupes_options = [...Object.values(EGroupeTD), ...Object.values(EGroupeTP)];
@@ -40,8 +52,7 @@
 
 			// Convert timestamp to Date object for the datetime-local input
 			if (devoir.expire_le_timestamp) {
-				const date = new Date(Number(devoir.expire_le_timestamp));
-				expire_le_timestamp = date;
+				expire_le_timestamp = formatDateTimeLocal(devoir.expire_le_timestamp);
 			}
 
 			// Parse groupes from comma-separated string if available
@@ -115,22 +126,26 @@
 	}
 </script>
 
-<div class="max-w-4xl mx-auto p-6 prose">
-	<h1 class="text-3xl font-bold mb-6">Modifier le devoir</h1>
+<div class="max-w-4xl mx-auto p-6 prose page-ajouter-devoir">
+	<h1 class="text-3xl font-bold mb-6">Formulaire d'ajouts</h1>
+
+	<h2 class="text-2xl mb-6">Rendu(s) / Exercice(s)</h2>
 
 	<form onsubmit={handleSubmit} class="space-y-6">
-		<div>
-			<label class="block text-sm font-medium text-gray-700 mb-2">Date et heure de rendu</label>
+			<div class="relative">
 			<input
-				required
 				type="datetime-local"
+				id="dateRendu"
 				bind:value={expire_le_timestamp}
-				class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+				required
+				class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 placeholder-transparent"
+				placeholder=" "
 			/>
+			<label for="dateRendu">Date et heure de rendu</label>
 		</div>
 
 		<div>
-			<label class="block text-sm font-medium text-gray-700 mb-2">Groupe (TOUS/TD/TP)</label>
+			<label class="block text-sm font-medium text-gray-700 mb-2">Groupes (TOUS/TD/TP)</label>
 			<div class="flex items-center gap-2">
 				<button
 					class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
@@ -186,15 +201,17 @@
 			</div>
 		</div>
 
-		<div>
-			<label class="block text-sm font-medium text-gray-700 mb-2">Titre du devoir</label>
-			<input
-				type="text"
-				required
-				bind:value={titre}
-				class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-			/>
-		</div>
+			<div class="relative">
+				<input
+					type="text"
+					id="titreDevoir"
+					bind:value={titre}
+					required
+					class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 placeholder-transparent"
+					placeholder=" "
+				/>
+				<label for="titreDevoir">Titre du devoir</label>
+			</div>
 
 		<div class="border border-gray-300 rounded-md p-4 min-h-[300px]">
 			<label class="block text-sm font-medium text-gray-700 mb-2">Contenu du devoir</label>
@@ -491,3 +508,39 @@
 		</div>
 	</form>
 </div>
+
+<style>
+	/* Styles pour les labels flottants */
+	.relative input,
+	.relative select,
+	.relative textarea {
+		padding-top: 1.25rem;
+	}
+
+	.relative label {
+		position: absolute;
+		left: 1rem;
+		top: 1.25rem;
+		font-size: 1rem;
+		color: #6b7280;
+		transition: all 0.2s ease-in-out;
+	}
+
+	.relative input:focus + label,
+	.relative input:not(:placeholder-shown) + label,
+	.relative select:focus + label,
+	.relative select:not([value=""]) + label,
+	.relative textarea:focus + label,
+	.relative textarea:not(:placeholder-shown) + label {
+		top: -0.5rem;
+		left: 0.75rem;
+		font-size: 0.875rem;
+		color: #4b3b7c;
+		background-color: white;
+		padding: 0 0.25rem;
+	}
+
+	body, .page-ajouter-devoir {
+		background: #fff !important;
+	}
+</style>

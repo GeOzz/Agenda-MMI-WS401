@@ -74,12 +74,13 @@
 				id="titre"
 				type="text"
 				bind:value={devoirForm.titre}
-				class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+				required
+				class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 placeholder-transparent"
 				placeholder=" "
 			/>
 			<label for="titre">Titre</label>
 			{#if erreurs.titre}
-				<p class="text-red-500 text-sm mt-1">{erreurs.titre}</p>
+				<p class="text-red-500 text-sm mt-1 font-medium">{erreurs.titre}</p>
 			{/if}
 		</div>
 
@@ -87,12 +88,13 @@
 			<textarea
 				id="description"
 				bind:value={devoirForm.description}
-				class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+				required
+				class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 placeholder-transparent"
 				placeholder=" "
 			></textarea>
 			<label for="description">Description</label>
 			{#if erreurs.description}
-				<p class="text-red-500 text-sm mt-1">{erreurs.description}</p>
+				<p class="text-red-500 text-sm mt-1 font-medium">{erreurs.description}</p>
 			{/if}
 		</div>
 
@@ -101,12 +103,13 @@
 				id="dateRendu"
 				type="datetime-local"
 				bind:value={devoirForm.dateRendu}
-				class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+				required
+				class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 placeholder-transparent"
 				placeholder=" "
 			/>
 			<label for="dateRendu">Date de rendu</label>
 			{#if erreurs.dateRendu}
-				<p class="text-red-500 text-sm mt-1">{erreurs.dateRendu}</p>
+				<p class="text-red-500 text-sm mt-1 font-medium">{erreurs.dateRendu}</p>
 			{/if}
 		</div>
 
@@ -114,16 +117,17 @@
 			<select
 				id="promotion"
 				bind:value={devoirForm.promotion}
+				required
 				class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
 			>
-				<option value="" disabled>Choisir une promotion</option>
+				<option value="" disabled selected>Choisir une promotion</option>
 				<option value="1ère Année (BUT1)">1ère Année (BUT1)</option>
 				<option value="2ème Année (BUT2)">2ème Année (BUT2)</option>
 				<option value="3ème Année (BUT3)">3ème Année (BUT3)</option>
 			</select>
 			<label for="promotion">Promotion</label>
 			{#if erreurs.promotion}
-				<p class="text-red-500 text-sm mt-1">{erreurs.promotion}</p>
+				<p class="text-red-500 text-sm mt-1 font-medium">{erreurs.promotion}</p>
 			{/if}
 		</div>
 
@@ -132,16 +136,17 @@
 				id="groupes"
 				bind:value={devoirForm.groupes}
 				multiple
+				required
 				class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
 			>
-				<option value="" disabled>Choisir un ou plusieurs groupes</option>
+				<option value="" disabled selected>Choisir un ou plusieurs groupes</option>
 				{#each groupesOptions as groupe}
 					<option value={groupe}>{groupe}</option>
 				{/each}
 			</select>
 			<label for="groupes">Groupes</label>
 			{#if erreurs.groupes}
-				<p class="text-red-500 text-sm mt-1">{erreurs.groupes}</p>
+				<p class="text-red-500 text-sm mt-1 font-medium">{erreurs.groupes}</p>
 			{/if}
 		</div>
 	</div>

@@ -11,10 +11,11 @@
 	import { STORE } from '$lib/store.svelte';
 
 	const matieres_options = Object.values(MATIERES);
-	let promotion = $state(EPromotion.PREMIERE_ANNEE);
-	let selectedMatiere = $state(matieres_options[0].id);
+	let promotion = $state("");
+	let selectedMatiere = $state("");
 	let expire_le_timestamp = $state(new Date());
 	let groupes = $state([]);
+	let groupesErreur = $state('');
 	let selectedGroupe = $state('');
 	const groupes_options = [...Object.values(EGroupeTD), ...Object.values(EGroupeTP)];
 
@@ -41,6 +42,8 @@
 	};
 
 	const groupesOptions = ['TD AB', 'TD CD', 'TD EF', 'TD GH', 'TD IJ'];
+
+	let dateErreur = $state('');
 
 	function validerChamps() {
 		erreurs = {
@@ -135,8 +138,48 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 	$effect(() => {
 		promotion = STORE.utilisateur?.role === 'ETUDIANT' ? MA_PROMOTION : promotion;
 	});
+
+	$effect(() => {
+		// lecture de promotion pour déclencher la réactivité
+		promotion;
+		selectedMatiere = "";
+	});
+
+	$effect(() => {
+		if (expire_le_timestamp && expire_le_timestamp < getMinDateTime()) {
+			expire_le_timestamp = getMinDateTime();
+		}
+	});
+
+	$effect(() => {
+		dateErreur = '';
+		if (expire_le_timestamp && new Date(expire_le_timestamp).getTime() <= Date.now()) {
+			dateErreur = 'La date et l\'heure doivent être dans le futur.';
+		}
+	});
+
+	// Pré-remplir et désactiver le select promotion si étudiant ou délégué
+	const isEtudiantOuDelegue = $derived.by(() => STORE.utilisateur?.role === 'ÉTUDIANT' || STORE.utilisateur?.role === 'DÉLÉGUÉ');
+	const maPromotion = $derived.by(() => STORE.utilisateur?.promotion);
+
+	$effect(() => {
+		if (isEtudiantOuDelegue) {
+			promotion = maPromotion;
+		}
+	});
+
 	async function handleSubmit(event: Event) {
 		event.preventDefault();
+		groupesErreur = '';
+		dateErreur = '';
+		if (groupes.length === 0) {
+			groupesErreur = 'Veuillez sélectionner au moins un groupe.';
+			return;
+		}
+		if (new Date(expire_le_timestamp).getTime() <= Date.now()) {
+			dateErreur = 'La date de rendu doit être dans le futur.';
+			return;
+		}
 		markdown = editor ? editor.storage.markdown.getMarkdown() : '';
 		console.log('Données à envoyer:', {
 			promotion,
@@ -146,6 +189,10 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 			markdown,
 			titre
 		});
+		if (isEtudiantOuDelegue && promotion !== maPromotion) {
+			alert("Vous ne pouvez ajouter un devoir que pour votre propre promotion.");
+			return;
+		}
 		try {
 			promotion = STORE.utilisateur?.role === 'ETUDIANT' ? MA_PROMOTION : promotion;
 			console.log(new Date(expire_le_timestamp).getTime());
@@ -211,6 +258,8 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 	const groupesTD = ['TD AB', 'TD CD', 'TD EF', 'TD GH', 'TD IJ'];
 	let groupesTP = [];
 	let selectedTD = '';
+	let groupeTD = ''; // Déclaration de la variable réactive pour le binding
+	let groupeTP = ''; // Déclaration de la variable réactive pour le binding
 
 	function mettreAJourGroupesTP(td: string) {
 		if (td === 'TD AB') groupesTP = ['TP A', 'TP B'];
@@ -221,70 +270,76 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 		else groupesTP = [];
 		devoirForm.groupes = []; // Réinitialiser les groupes sélectionnés
 	}
+
+	function getDateActuelle() {
+		const now = new Date();
+		const year = now.getFullYear();
+		const month = String(now.getMonth() + 1).padStart(2, '0');
+		const day = String(now.getDate()).padStart(2, '0');
+		const hours = String(now.getHours()).padStart(2, '0');
+		const minutes = String(now.getMinutes()).padStart(2, '0');
+		return `${year}-${month}-${day}T${hours}:${minutes}`;
+	}
+	let dateActuelle = getDateActuelle();
 </script>
 
-<div class="max-w-4xl mx-auto p-6 prose">
+<div class="max-w-4xl mx-auto p-6 prose page-ajouter-devoir">
 	<h1 class="text-3xl font-bold mb-6">Formulaire d'ajouts</h1>
 
 	<h2 class="text-2xl mb-6">Rendu(s) / Exercice(s)</h2>
 
 	<form onsubmit={handleSubmit} class="space-y-6">
 		<div class="grid grid-cols-2 gap-6">
-			<div>
-				<label class="block text-sm font-medium text-gray-700 mb-2">Promotion</label>
+			<div class="relative">
 				<select
+					id="promotion"
+					bind:value={promotion}
 					required
-					onchange={(e) => {
-						const value = e.target.value;
-						promotion = value;
-					}}
-					class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+					class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+					disabled={isEtudiantOuDelegue}
 				>
-					{#each PROMOTIONS_OPTIONS as promotion}
-						<option selected={MA_PROMOTION === promotion} value={promotion}>
-							{promotion}
-						</option>
+					<option value="" disabled selected>Choisir une promotion</option>
+					{#each PROMOTIONS_OPTIONS as promo}
+						<option value={promo}>{promo}</option>
 					{/each}
 				</select>
+				<label for="promotion" class="absolute left-4 top-2 text-gray-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:text-purple-500">Promotion</label>
 			</div>
 
-			<div>
-				<label class="block text-sm font-medium text-gray-700 mb-2">Matière</label>
-
+			<div class="relative">
 				<select
+					id="matiere"
+					bind:value={selectedMatiere}
 					required
-					onchange={(e) => {
-						const value = e.target.value;
-						if (value === '1') {
-							selectedMatiere = MATIERES_FILTRE[0]?.id;
-						} else {
-							selectedMatiere = value;
-						}
-					}}
-					class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+					class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
 				>
-					{#each MATIERES_FILTRE as matiere}
-						<option
-							selected={selectedMatiere === matiere.id || MATIERES_FILTRE[0]?.id === matiere.id}
-							value={matiere.id}>{matiere.nom}</option
-						>
+					<option value="" disabled selected>Choisir une matière</option>
+					{#each MATIERES_FILTRE as matiere, index}
+						<option value={matiere.id}>{matiere.nom}</option>
 					{/each}
 				</select>
+				<label for="matiere" class="absolute left-4 top-2 text-gray-500 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-gray-400 peer-focus:top-2 peer-focus:text-purple-500">Matière</label>
 			</div>
 		</div>
 
-		<div>
-			<label class="block text-sm font-medium text-gray-700 mb-2">Date et heure de rendu</label>
+		<div class="relative">
 			<input
-				required
 				type="datetime-local"
+				id="dateRendu"
 				bind:value={expire_le_timestamp}
-				class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-					/>
+				required
+				min={dateActuelle}
+				class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 placeholder-transparent"
+				placeholder=" "
+			/>
+			<label for="dateRendu">Date et heure de rendu</label>
+			{#if dateErreur}
+				<p class="text-red-600 text-sm mt-1">{dateErreur}</p>
+			{/if}
 		</div>
 
 		<div>
-			<label class="block text-sm font-medium text-gray-700 mb-2">Groupe (TOUS/TD/TP)</label>
+			<label class="block text-sm font-medium text-gray-700 mb-2">Groupes (TOUS/TD/TP)</label>
 			<div class="flex items-center gap-2">
 				<button
 					class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
@@ -338,17 +393,23 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 					</span>
 				{/each}
 			</div>
+			{#if groupesErreur}
+				<p class="text-red-600 text-sm mt-1">{groupesErreur}</p>
+			{/if}
 		</div>
 
-		<div>
-			<label class="block text-sm font-medium text-gray-700 mb-2">Titre du devoir</label>
+		<div class="relative">
 			<input
 				type="text"
-				required
+				id="titreDevoir"
 				bind:value={titre}
-				class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-					/>
+				required
+				class="peer w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 placeholder-transparent"
+				placeholder=" "
+			/>
+			<label for="titreDevoir">Titre du devoir</label>
 		</div>
+
 
 		<div class="border border-gray-300 bg-white rounded-md p-4 min-h-[300px]">
 			<label class="block text-sm font-medium text-gray-700 mb-2">Contenu du devoir</label>
@@ -640,6 +701,7 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 				type="submit"
 				class="px-4 py-2 text-white rounded-md hover:brightness-110"
 				style="background-color: #4B3B7C"
+				disabled={!!dateErreur}
 			>
 				Ajouter
 			</button>
@@ -677,5 +739,9 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 		color: #4b3b7c; /* Couleur violette */
 		background-color: white; /* Fond blanc pour éviter le chevauchement */
 		padding: 0 0.25rem; /* Ajout de padding pour le fond blanc */
+	}
+
+	body, .page-ajouter-devoir {
+		background: #fff !important;
 	}
 </style>

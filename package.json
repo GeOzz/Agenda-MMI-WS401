@@ -26,7 +26,7 @@
 		"@types/bcrypt": "^5.0.2",
 		"@types/better-sqlite3": "^7.6.12",
 		"@unocss/preset-icons": "^66.1.0-beta.5",
-		"drizzle-kit": "^0.30.5",
+		"drizzle-kit": "^0.31.0",
 		"nanoid": "^5.1.4",
 		"prettier": "^3.4.2",
 		"prettier-plugin-svelte": "^3.3.3",
@@ -37,7 +37,7 @@
 		"vite": "^6.0.0"
 	},
 	"dependencies": {
-		"@inlang/paraglide-sveltekit": "^0.15.5",
+		"@inlang/paraglide-sveltekit": "^0.15.0",
 		"@tiptap/core": "^2.11.5",
 		"@tiptap/extension-color": "^2.11.5",
 		"@tiptap/extension-list-item": "^2.11.5",
@@ -46,8 +46,10 @@
 		"bcrypt": "^5.1.1",
 		"better-sqlite3": "^11.8.0",
 		"drizzle-orm": "^0.40.1",
+		"flatpickr": "^4.6.13",
+		"svelte-datepicker": "^1.0.0",
 		"svelte-markdown": "^0.4.1",
-		"tiptap": "^1.32.2",
+		"tiptap": "^0.15.0",
 		"tiptap-markdown": "^0.8.10"
 	}
 }

@@ -152,26 +152,22 @@
 			<div
 				class="w-16 bg-gray-100 rounded-l-lg shadow-md flex flex-col items-center py-4 space-y-4"
 			>
-				<a
-					href={`/devoir/${devoir.id}/editer`}
-					class="p-2 hover:bg-gray-200 rounded-full tooltip"
-					data-tooltip="Modifier"
-				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						class="h-6 w-6 text-gray-600"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="currentColor"
+				{#if STORE.utilisateur?.role === ERoleUtilisateur.PROFESSEUR
+					|| STORE.utilisateur?.role === ERoleUtilisateur.DELEGUE
+					|| devoir.utilisateur_id_createur === STORE.utilisateur?.id}
+					<a
+						href={`/devoir/${devoir.id}/editer`}
+						class="p-2 rounded-full hover:bg-purple-100 group relative"
+						data-tooltip="Modifier"
+						title="Modifier"
 					>
-						<path
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							stroke-width="2"
-							d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-						/>
-					</svg>
-				</a>
+						<!-- Ancien logo crayon -->
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 text-black-700 group-hover:text-purple-900">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487a2.1 2.1 0 1 1 2.97 2.97L7.5 19.789l-4 1 1-4L16.862 4.487ZM19 7l-2-2" />
+						</svg>
+						<span class="absolute left-full ml-2 top-1/2 -translate-y-1/2 text-white text-xs rounded px-2 py-1 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Modifier</span>
+					</a>
+				{/if}
 				{#if devoir.utilisateur_id_createur === STORE?.utilisateur?.id || STORE.utilisateur?.role === ERoleUtilisateur.PROFESSEUR || STORE.utilisateur?.role === ERoleUtilisateur.DELEGUE}
 					<button
 						onclick={() => handleSupprimerDevoir()}

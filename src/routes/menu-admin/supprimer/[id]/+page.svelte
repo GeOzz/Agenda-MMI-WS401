@@ -45,7 +45,7 @@
 				showSuccessPopup = true; // Afficher le popup de succès
 				setTimeout(() => {
 					goto('/menu-admin'); // Rediriger après un délai
-				}, 2000);
+				}, 1000);
 			} else {
 				alert('Erreur lors de la suppression de l’utilisateur');
 			}
