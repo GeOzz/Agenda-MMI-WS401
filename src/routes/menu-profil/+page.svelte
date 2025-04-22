@@ -193,6 +193,9 @@
 					class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 text-gray-500"
 				/>
 			</div>
+			<p class="text-sm text-gray-500 mt-4">
+				Pour toute modification de votre promotion, groupe TD, TP ou rôle, contactez l'administrateur à <a href="mailto:prof@mmi-troyes.fr" class="text-[#4B3B7C] underline">prof@mmi-troyes.fr</a>.
+			</p>
 		</div>
 
 		<div class="mt-6 flex justify-end">
