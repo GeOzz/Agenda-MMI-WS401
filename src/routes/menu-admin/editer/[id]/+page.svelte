@@ -210,11 +210,6 @@
 						<input type="radio" name="role" value="DÉLÉGUÉ" bind:group={utilisateur.role} />
 						<span>DÉLÉGUÉ</span>
 					</label>
-					<!-- Ajout d'une option pour le rôle PROFESSEUR -->
-					<label class="flex items-center gap-2">
-						<input type="radio" name="role" value="PROFESSEUR" bind:group={utilisateur.role} />
-						<span>PROFESSEUR</span>
-					</label>
 				</div>
 
 				<div class="relative">
