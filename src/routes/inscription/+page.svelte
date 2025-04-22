@@ -296,7 +296,9 @@
             </div>
 
             <div class="flex items-center justify-between pt-4">
-                <a href="/connexion" class="text-sm text-gray-600">Vous avez déjà un compte ?</a>
+                <a href="/connexion" class="text-sm text-gray-600 hover:text-[#4B3B7C] hover:underline transition-colors duration-200">
+                    Vous avez déjà un compte ?
+                </a>
                 <button
                     type="submit"
                     class="px-6 py-2 rounded-md font-semibold btn-primary"
