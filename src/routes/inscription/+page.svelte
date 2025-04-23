@@ -239,24 +239,6 @@
                 {/if}
             </div>
 
-            <div class="relative">
-                <label class="block text-gray-700 font-bold mb-2">Rôles de l'utilisateur</label>
-                <div class="flex flex-wrap gap-4">
-                    {#each Object.values(ERoleUtilisateur).filter(role => role !== 'PROFESSEUR') as role}
-                        <label class="flex items-center space-x-2">
-                            <input
-                                type="radio"
-                                name="role"
-                                value={role}
-                                bind:group={utilisateur.role}
-                                class="form-radio text-purple-500 focus:ring-purple-500"
-                            />
-                            <span class="text-gray-700">{role}</span>
-                        </label>
-                    {/each}
-                </div>
-            </div>
-
             <div class="grid grid-cols-2 gap-6">
                 <div class="relative">
                     <select
