@@ -13,7 +13,7 @@
 	const matieres_options = Object.values(MATIERES);
 	let promotion = $state("");
 	let selectedMatiere = $state("");
-	let expire_le_timestamp = $state(new Date());
+	let expire_le_timestamp = $state(getDateLendemain());
 	let groupes = $state([]);
 	let groupesErreur = $state('');
 	let selectedGroupe = $state('');
@@ -44,6 +44,15 @@
 	const groupesOptions = ['TD AB', 'TD CD', 'TD EF', 'TD GH', 'TD IJ'];
 
 	let dateErreur = $state('');
+
+	let userTD = '';
+	let userTP = '';
+	$effect(() => {
+		if (STORE.utilisateur) {
+			userTD = STORE.utilisateur.groupeTD || '';
+			userTP = STORE.utilisateur.groupeTP || '';
+		}
+	});
 
 	function validerChamps() {
 		erreurs = {
@@ -109,25 +118,7 @@
 					transformCopiedText: false // Copied text is transformed to markdown
 				})
 			],
-			content: `
-# Titre principal
-
-## Sous-titre
-
-Ceci est un paragraphe avec du texte **en gras** et *en italique*.
-
-### Liste à puces
-- Premier élément
-- Deuxième élément
-- Troisième élément
-
-### Liste numérotée
-1. Premier point
-2. Deuxième point
-3. Troisième point
-
-> Ceci est une citation
-			`,
+			content: `Tapez ici le contenu du devoir...`,
 			onTransaction: () => {
 				// force re-render so `editor.isActive` works as expected
 				editor = editor;
@@ -280,6 +271,19 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 		const minutes = String(now.getMinutes()).padStart(2, '0');
 		return `${year}-${month}-${day}T${hours}:${minutes}`;
 	}
+
+	// Nouvelle fonction pour le lendemain à la même heure
+	function getDateLendemain() {
+		const now = new Date();
+		now.setDate(now.getDate() + 1);
+		const year = now.getFullYear();
+		const month = String(now.getMonth() + 1).padStart(2, '0');
+		const day = String(now.getDate()).padStart(2, '0');
+		const hours = String(now.getHours()).padStart(2, '0');
+		const minutes = String(now.getMinutes()).padStart(2, '0');
+		return `${year}-${month}-${day}T${hours}:${minutes}`;
+	}
+
 	let dateActuelle = getDateActuelle();
 </script>
 
@@ -333,70 +337,149 @@ Ceci est un paragraphe avec du texte **en gras** et *en italique*.
 				placeholder=" "
 			/>
 			<label for="dateRendu">Date et heure de rendu</label>
-			{#if dateErreur}
-				<p class="text-red-600 text-sm mt-1">{dateErreur}</p>
+			{#if expire_le_timestamp && expire_le_timestamp !== '' && new Date(expire_le_timestamp).getTime() <= Date.now()}
+				<p class="text-red-600 text-sm mt-1">La date choisie est déjà passée, merci d'en prendre une à venir.</p>
 			{/if}
 		</div>
 
-		<div>
-			<label class="block text-sm font-medium text-gray-700 mb-2">Groupes (TOUS/TD/TP)</label>
-			<div class="flex items-center gap-2">
-				<button
-					class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-					type="button"
-					onclick={() => {
-						if (groupes.length === groupes_options.length) {
-							groupes = [];
-						} else {
-							groupes = [...groupes_options];
-						}
-					}}
-				>
-					{groupes.length === groupes_options.length ? 'Effacer' : 'Tous'}
-				</button>
-				<select
-					bind:value={selectedGroupe}
-					class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-				>
-					<option value="" disabled selected>Choisir un groupe</option>
-					{#each groupes_options as groupe}
-						<option value={groupe}>{groupe}</option>
-					{/each}
-				</select>
-				<button
-					class="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
-					type="button"
-					onclick={() => {
-						if (selectedGroupe === '') {
-							alert('Veuillez sélectionner un groupe');
-							return;
-						}
-						if (groupes.find((g) => g === selectedGroupe)) {
-							alert('Ce groupe est déjà sélectionné');
-						} else {
-							groupes = [...groupes, selectedGroupe];
-						}
-					}}
-				>
-					Ajouter
-				</button>
-			</div>
-			<div class="flex flex-wrap gap-2 mt-3">
-				{#each groupes as groupe}
-					<span
-						class="bg-purple-100 text-purple-800 px-3 py-1 rounded-full flex items-center gap-2"
+		{#if STORE.utilisateur?.role === 'ETUDIANT' || STORE.utilisateur?.role === 'DÉLÉGUÉ'}
+			<div class="mb-4">
+				<label class="block text-base font-bold text-gray-700 mb-2">Groupe concerné</label>
+				<div class="flex gap-2 items-center">
+					<select
+						id="groupeSelect"
+						bind:value={selectedGroupe}
+						class="px-10 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
 					>
-						{groupe}
-						<button type="button" onclick={() => (groupes = groupes.filter((g) => g !== groupe))}>
-							<div class="i-ph:x-bold w-4 h-4 rounded-full"></div>
-						</button>
-					</span>
-				{/each}
+						<option value="" disabled selected>Choisir un groupe</option>
+						{#if userTD && !groupes.includes(userTD)}
+							<option value={userTD}>Mon groupe TD : {userTD}</option>
+						{:else if !userTD}
+							<option disabled>(Aucun groupe TD trouvé)</option>
+						{/if}
+						{#if userTP && !groupes.includes(userTP)}
+							<option value={userTP}>Mon groupe TP : {userTP}</option>
+						{:else if !userTP}
+							<option disabled>(Aucun groupe TP trouvé)</option>
+						{/if}
+						{#if !groupes.includes('Tous')}
+							<option value="Tous">Tous les groupes (toute la promo)</option>
+						{/if}
+					</select>
+					<button
+						type="button"
+						class="px-3 py-2 bg-[#4B3B7C] text-white rounded-md font-semibold hover:brightness-110"
+						onclick={() => {
+							if (selectedGroupe) {
+								if (selectedGroupe === 'Tous') {
+									groupes = [...Object.values(EGroupeTD), ...Object.values(EGroupeTP)];
+								} else {
+									groupes = groupes.filter(g => g !== 'Tous');
+									if (!groupes.includes(selectedGroupe)) {
+										groupes = [...groupes, selectedGroupe];
+									}
+								}
+								selectedGroupe = '';
+							}
+						}}
+						disabled={!selectedGroupe}
+					>
+						Ajouter
+					</button>
+				</div>
+				<div class="flex flex-wrap gap-2 mt-2">
+					{#if groupes.length === Object.values(EGroupeTD).length + Object.values(EGroupeTP).length}
+						<span class="inline-flex items-center bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
+							Tous
+							<button type="button" class="ml-2 text-purple-600 hover:text-red-500" onclick={() => {
+								groupes = [];
+							}} title="Retirer tous les groupes">&times;</button>
+						</span>
+					{:else}
+						{#each groupes as groupe}
+							<span class="inline-flex items-center bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
+								{groupe}
+								<button type="button" class="ml-2 text-purple-600 hover:text-red-500" onclick={() => {
+									groupes = groupes.filter(g => g !== groupe);
+								}} title="Retirer ce groupe">&times;</button>
+							</span>
+						{/each}
+					{/if}
+				</div>
+				<p class="text-xs text-gray-500 mt-1">
+					Ajoutez votre groupe TD, TP, ou "Tous les groupes" pour toute promotion.
+				</p>
+				{#if groupesErreur}
+					<p class="text-red-600 text-sm mt-1">{groupesErreur}</p>
+				{/if}
 			</div>
-			{#if groupesErreur}
-				<p class="text-red-600 text-sm mt-1">{groupesErreur}</p>
-			{/if}
-		</div>
+		{:else}
+			<div class="mb-4">
+				<label class="block text-base font-bold text-gray-700 mb-2">Groupes concernés</label>
+				<div class="flex gap-2 items-center">
+					<select
+						id="groupeSelect"
+						bind:value={selectedGroupe}
+						class="px-10 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+					>
+						<option value="" disabled selected>Choisir un groupe</option>
+						{#each groupes_options as groupe}
+							{#if !groupes.includes(groupe)}
+								<option value={groupe}>{groupe}</option>
+							{/if}
+						{/each}
+						{#if !groupes.includes('Tous')}
+							<option value="Tous">Toute la promotion</option>
+						{/if}
+					</select>
+					<button
+						type="button"
+						class="px-3 py-2 bg-[#4B3B7C] text-white rounded-md font-semibold hover:brightness-110"
+						onclick={() => {
+							if (selectedGroupe) {
+								if (selectedGroupe === 'Tous') {
+									groupes = [...Object.values(EGroupeTD), ...Object.values(EGroupeTP)];
+								} else {
+									groupes = groupes.filter(g => g !== 'Tous');
+									if (!groupes.includes(selectedGroupe)) {
+										groupes = [...groupes, selectedGroupe];
+									}
+								}
+								selectedGroupe = '';
+							}
+						}}
+						disabled={!selectedGroupe}
+					>
+						Ajouter
+					</button>
+				</div>
+				<div class="flex flex-wrap gap-2 mt-2">
+					{#if groupes.length === Object.values(EGroupeTD).length + Object.values(EGroupeTP).length}
+						<span class="inline-flex items-center bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
+							Tous
+							<button type="button" class="ml-2 text-purple-600 hover:text-red-500" onclick={() => {
+								groupes = [];
+							}} title="Retirer tous les groupes">&times;</button>
+						</span>
+					{:else}
+						{#each groupes as groupe}
+							<span class="inline-flex items-center bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-medium">
+								{groupe}
+								<button type="button" class="ml-2 text-purple-600 hover:text-red-500" onclick={() => {
+									groupes = groupes.filter(g => g !== groupe);
+								}} title="Retirer ce groupe">&times;</button>
+							</span>
+						{/each}
+					{/if}
+				</div>
+				<p class="text-xs text-gray-500 mt-1">
+					Ajoutez un ou plusieurs groupes TD/TP, ou "Tous les groupes" pour toute la promotion.
+				</p>
+				{#if groupesErreur}
+					<p class="text-red-600 text-sm mt-1">{groupesErreur}</p>
+				{/if}
+			</div>
+		{/if}
 
 		<div class="relative">
 			<input
