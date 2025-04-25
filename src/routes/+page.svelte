@@ -12,13 +12,20 @@
 	let devoirsGroupes = {};
 	let activePage = 'accueil'; // 'accueil' ou 'historique'
 
+	// Utilisation du localStorage par utilisateur (clé unique par id utilisateur)
+	function getStorageKey() {
+		const id = STORE.utilisateur?.id;
+		return id ? `devoirs_deja_fait_${id}` : 'devoirs_deja_fait';
+	}
+
 	onMount(async () => {
 		const response = await fetch('/api/devoirs');
 		const devoirs = await response.json();
 		DEVOIRS = devoirs;
 		devoirsGroupes = regrouperParPromotionEtTrier(devoirs);
 
-		const _devoirs_deja_fait = JSON.parse(window.localStorage.getItem('devoirs_deja_fait') || '[]');
+		const storageKey = getStorageKey();
+		const _devoirs_deja_fait = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
 		devoirs_deja_fait = _devoirs_deja_fait;
 		devoirs_a_faire = DEVOIRS.filter((devoir) => !_devoirs_deja_fait.includes(devoir.id));
 	});
@@ -62,18 +69,20 @@
 	}
 
 	function handleDejaFait(devoir) {
+		const storageKey = getStorageKey();
 		if (!devoirs_deja_fait.includes(devoir.id)) {
 			devoirs_deja_fait = [...devoirs_deja_fait, devoir.id];
 			devoirs_a_faire = devoirs_a_faire.filter((d) => d.id !== devoir.id);
-			window.localStorage.setItem('devoirs_deja_fait', JSON.stringify(devoirs_deja_fait));
+			window.localStorage.setItem(storageKey, JSON.stringify(devoirs_deja_fait));
 		}
 	}
 
 	function handleAFaire(devoir) {
+		const storageKey = getStorageKey();
 		if (devoirs_deja_fait.includes(devoir.id)) {
 			devoirs_deja_fait = devoirs_deja_fait.filter((id) => id !== devoir.id);
 			devoirs_a_faire = [...devoirs_a_faire, devoir];
-			window.localStorage.setItem('devoirs_deja_fait', JSON.stringify(devoirs_deja_fait));
+			window.localStorage.setItem(storageKey, JSON.stringify(devoirs_deja_fait));
 		}
 	}
 
@@ -93,44 +102,43 @@
 		<!-- Barre de navigation responsive mobile : chaque bouton est indépendant -->
 		{#if activePage === 'accueil'}
 			<div class="w-full flex md:hidden bg-gray-100 shadow-md z-40" style="position:fixed; top:95px; left:0; right:0;">
-					<button
-						class="flex-1 py-4 text-center font-bold text-[#4D3677] bg-white shadow-md border-b-4 border-yellow-500 rounded-t-lg"
-						aria-current="page"
-						style="width:100vw;"
-					>
-						Accueil
-					</button>
-					<button
-						class="flex-1 py-4 text-center font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 border-b-4 border-transparent rounded-t-lg"
-						on:click={() => setActivePage('historique')}
-						style="width:100vw;"
-					>
-						Historique
-					</button>
-				</div>
+				<button
+					class="flex-1 py-4 text-center font-bold text-[#4D3677] bg-white shadow-md border-b-4 border-yellow-500 rounded-t-lg"
+					aria-current="page"
+					style="width:100vw;"
+				>
+					Accueil
+				</button>
+				<button
+					class="flex-1 py-4 text-center font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 border-b-4 border-transparent rounded-t-lg"
+					on:click={() => setActivePage('historique')}
+					style="width:100vw;"
+				>
+					Historique
+				</button>
+			</div>
 		{:else if activePage === 'historique'}
 			<div class="w-full flex md:hidden bg-gray-100 shadow-md z-40" style="position:fixed; top:100px; left:0; right:0;">
-					<button
-						class="flex-1 py-4 text-center font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 border-b-4 border-transparent rounded-t-lg"
-						on:click={() => setActivePage('accueil')}
-						style="width:100vw;"
-					>
-						Accueil
-					</button>
-					<button
-						class="flex-1 py-4 text-center font-bold text-[#4D3677] bg-white shadow-md border-b-4 border-yellow-500 rounded-t-lg"
-						aria-current="page"
-						style="width:100vw;"
-					>
-						Historique
-					</button>
-				</div>
+				<button
+					class="flex-1 py-4 text-center font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 border-b-4 border-transparent rounded-t-lg"
+					on:click={() => setActivePage('accueil')}
+					style="width:100vw;"
+				>
+					Accueil
+				</button>
+				<button
+					class="flex-1 py-4 text-center font-bold text-[#4D3677] bg-white shadow-md border-b-4 border-yellow-500 rounded-t-lg"
+					aria-current="page"
+					style="width:100vw;"
+				>
+					Historique
+				</button>
+			</div>
 		{/if}
-		<div class="flex flex-col md:flex-row">
+		<div class="flex flex-col md:flex-row mt-[70px] md:mt-0">
 			<!-- Menu de navigation à gauche (historique) -->
 			<nav
 				class="w-64 h-screen bg-gray-100 text-black flex-col fixed left-0 overflow-y-auto shadow-lg z-10 hidden md:flex"
-				style="top:70px;"
 			>
 				<div class="p-4">
 					<h2 class="text-2xl font-bold">Historique</h2>
@@ -231,7 +239,7 @@
 			</nav>
 
 			<!-- Contenu principal -->
-			<div class="flex-1 md:ml-64 mx-auto p-4 md:p-8 mt-0 md:mt-6 bg-white min-h-screen max-w-5xl">
+			<div class="flex-1 md:ml-64 mx-auto p-4 md:p-8 mt-0 md:mt-6 bg-white min-h-screen">
 				{#if activePage === 'accueil'}
 					<!-- Section Accueil -->
 					{#if STORE.utilisateur?.role === ERoleUtilisateur.PROFESSEUR}
@@ -242,9 +250,9 @@
 							<div class="mb-10">
 								<h2 class="text-2xl font-bold mb-4 text-[#4D3677]">{promotion}</h2>
 								{#if devoirs.length > 0}
-									<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+									<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 										{#each devoirs as devoir}
-											<div class="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200 w-full max-w-xs mx-auto sm:max-w-full">
+											<div class="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
 												<div class="bg-[#4D3677] text-white p-4">
 													<h3 class="text-lg font-bold truncate">{devoir.titre}</h3>
 													<p class="text-sm">{devoir.matiere}</p>
@@ -277,7 +285,7 @@
 						</h1>
 
 						<!-- Section des devoirs à faire -->
-							<div class="max-w-3xl mx-auto">
+						<div>
 							<h2 class="text-2xl font-bold mb-4 text-[#4D3677]">Devoirs à faire</h2>
 							{#if devoirs_a_faire.length > 0}
 								<div class="space-y-4 mb-8">
@@ -339,7 +347,7 @@
 						</div>
 
 						<!-- Section des devoirs déjà faits -->
-							<div class="max-w-3xl mx-auto">
+						<div>
 							<h2 class="text-2xl font-bold mb-4 text-[#4D3677]">Devoirs déjà faits</h2>
 							{#if DEVOIRS.filter((devoir) => devoirs_deja_fait.includes(devoir.id)).length > 0}
 								<div class="space-y-4 mb-8">

@@ -31,7 +31,7 @@
 			<NavMenu {utilisateur} />
 		</div>
 	{/if}
-	<div class="mt-40 sm:mt-18">
+	<div class="mt-35 sm:mt-18">
 		<slot />
 	</div>
 </ParaglideJS>

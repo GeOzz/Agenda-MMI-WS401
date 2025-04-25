@@ -47,6 +47,7 @@
 
 	let userTD = '';
 	let userTP = '';
+	let erreurTDTP = $state('');
 	$effect(() => {
 		if (STORE.utilisateur) {
 			userTD = STORE.utilisateur.groupeTD || '';
@@ -55,16 +56,29 @@
 	});
 
 	function validerChamps() {
-		erreurs = {
-			titre: devoirForm.titre.length < 3 ? '' : '',
-			description: devoirForm.description.length < 10 ? '' : '',
-			dateRendu: devoirForm.dateRendu === '' ? '' : '',
-			promotion: devoirForm.promotion === '' ? '' : '',
-			groupes: devoirForm.groupes.length === 0 ? '' : ''
-		};
+			erreurTDTP = '';
+			erreurs = {
+				titre: devoirForm.titre.length < 3 ? '' : '',
+				description: devoirForm.description.length < 10 ? '' : '',
+				dateRendu: devoirForm.dateRendu === '' ? '' : '',
+				promotion: devoirForm.promotion === '' ? '' : '',
+				groupes: devoirForm.groupes.length === 0 ? '' : ''
+			};
 
-		return Object.values(erreurs).every((erreur) => erreur === '');
-	}
+			// Vérifie que le TD et TP de l'utilisateur sont bien dans la sélection
+			if (
+				STORE.utilisateur?.role === 'ÉTUDIANT' || STORE.utilisateur?.role === 'DÉLÉGUÉ'
+			) {
+				if (userTD && !groupes.includes(userTD)) {
+					erreurTDTP = "Vous ne pouvez pas ajouter un devoir qui n'est pas attribué à votre TD.";
+				}
+				if (userTP && !groupes.includes(userTP)) {
+					erreurTDTP = "Vous ne pouvez pas ajouter un devoir qui n'est pas attribué à votre TP.";
+				}
+			}
+
+			return Object.values(erreurs).every((erreur) => erreur === '') && !erreurTDTP;
+		}
 
 	async function ajouterDevoir() {
 		if (!validerChamps()) {
@@ -163,6 +177,8 @@
 		event.preventDefault();
 		groupesErreur = '';
 		dateErreur = '';
+		erreurTDTP = '';
+
 		if (groupes.length === 0) {
 			groupesErreur = 'Veuillez sélectionner au moins un groupe.';
 			return;
@@ -171,6 +187,19 @@
 			dateErreur = 'La date de rendu doit être dans le futur.';
 			return;
 		}
+
+		// Vérification stricte ici AVANT l'envoi
+		if ((STORE.utilisateur?.role === 'ÉTUDIANT' || STORE.utilisateur?.role === 'DÉLÉGUÉ')) {
+			if (userTD && !groupes.includes(userTD)) {
+				erreurTDTP = "Vous ne pouvez pas ajouter un devoir qui n'est pas attribué à votre TD.";
+				return;
+			}
+			if (userTP && !groupes.includes(userTP)) {
+				erreurTDTP = "Vous ne pouvez pas ajouter un devoir qui n'est pas attribué à votre TP.";
+				return;
+			}
+		}
+
 		markdown = editor ? editor.storage.markdown.getMarkdown() : '';
 		console.log('Données à envoyer:', {
 			promotion,
@@ -208,6 +237,7 @@
 			console.error(error);
 		}
 	}
+
 	let MA_PROMOTION = $derived(STORE.utilisateur?.promotion);
 
 	let PROMOTIONS_OPTIONS = $derived.by(() => {
@@ -287,13 +317,13 @@
 	let dateActuelle = getDateActuelle();
 </script>
 
-<div class="max-w-4xl mx-auto p-6 prose page-ajouter-devoir">
-	<h1 class="text-3xl font-bold mb-6">Formulaire d'ajouts</h1>
+<div class="max-w-5xl mx-auto p-0 sm:p-6 prose page-ajouter-devoir">
+	<h1 class="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">Formulaire d'ajouts</h1>
 
-	<h2 class="text-2xl mb-6">Rendu(s) / Exercice(s)</h2>
+	<h2 class="text-xl sm:text-2xl mb-4 sm:mb-6">Rendu(s) / Exercice(s)</h2>
 
-	<form onsubmit={handleSubmit} class="space-y-6">
-		<div class="grid grid-cols-2 gap-6">
+	<form onsubmit={handleSubmit} class="space-y-4 sm:space-y-6">
+		<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
 			<div class="relative">
 				<select
 					id="promotion"
@@ -345,31 +375,38 @@
 		{#if STORE.utilisateur?.role === 'ETUDIANT' || STORE.utilisateur?.role === 'DÉLÉGUÉ'}
 			<div class="mb-4">
 				<label class="block text-base font-bold text-gray-700 mb-2">Groupe concerné</label>
-				<div class="flex gap-2 items-center">
+				<div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
 					<select
 						id="groupeSelect"
 						bind:value={selectedGroupe}
-						class="px-10 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+						class="w-full sm:w-[320px] px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
 					>
 						<option value="" disabled selected>Choisir un groupe</option>
-						{#if userTD && !groupes.includes(userTD)}
-							<option value={userTD}>Mon groupe TD : {userTD}</option>
-						{:else if !userTD}
-							<option disabled>(Aucun groupe TD trouvé)</option>
-						{/if}
-						{#if userTP && !groupes.includes(userTP)}
-							<option value={userTP}>Mon groupe TP : {userTP}</option>
-						{:else if !userTP}
-							<option disabled>(Aucun groupe TP trouvé)</option>
-						{/if}
+						{#each groupes_options as groupe}
+							{#if !groupes.includes(groupe)}
+								<option value={groupe}>{groupe}</option>
+							{/if}
+						{/each}
 						{#if !groupes.includes('Tous')}
 							<option value="Tous">Tous les groupes (toute la promo)</option>
 						{/if}
 					</select>
 					<button
 						type="button"
-						class="px-3 py-2 bg-[#4B3B7C] text-white rounded-md font-semibold hover:brightness-110"
+						class="w-full sm:w-auto sm:min-w-[120px] px-3 py-2 sm:px-6 sm:py-2 bg-[#4B3B7C] text-white rounded-md font-semibold hover:brightness-110"
 						onclick={() => {
+							// Ajout d'une vérification stricte pour TD/TP avant d'ajouter
+							if ((STORE.utilisateur?.role === 'ÉTUDIANT' || STORE.utilisateur?.role === 'DÉLÉGUÉ')) {
+								if (userTD && !groupes.includes(userTD) && selectedGroupe !== userTD && selectedGroupe !== 'Tous') {
+									erreurTDTP = "Vous ne pouvez pas ajouter un devoir qui n'est pas attribué à votre TD.";
+									return;
+								}
+								if (userTP && !groupes.includes(userTP) && selectedGroupe !== userTP && selectedGroupe !== 'Tous') {
+									erreurTDTP = "Vous ne pouvez pas ajouter un devoir qui n'est pas attribué à votre TP.";
+									return;
+								}
+							}
+							erreurTDTP = '';
 							if (selectedGroupe) {
 								if (selectedGroupe === 'Tous') {
 									groupes = [...Object.values(EGroupeTD), ...Object.values(EGroupeTP)];
@@ -386,6 +423,9 @@
 					>
 						Ajouter
 					</button>
+					{#if erreurTDTP}
+						<p class="text-red-600 text-sm mt-1">{erreurTDTP}</p>
+					{/if}
 				</div>
 				<div class="flex flex-wrap gap-2 mt-2">
 					{#if groupes.length === Object.values(EGroupeTD).length + Object.values(EGroupeTP).length}
@@ -407,20 +447,23 @@
 					{/if}
 				</div>
 				<p class="text-xs text-gray-500 mt-1">
-					Ajoutez votre groupe TD, TP, ou "Tous les groupes" pour toute promotion.
+					Ajoutez un ou plusieurs groupes TD/TP, ou "Tous les groupes" pour toute la promotion.
 				</p>
 				{#if groupesErreur}
 					<p class="text-red-600 text-sm mt-1">{groupesErreur}</p>
+				{/if}
+				{#if erreurTDTP}
+					<p class="text-red-600 text-sm mt-1">{erreurTDTP}</p>
 				{/if}
 			</div>
 		{:else}
 			<div class="mb-4">
 				<label class="block text-base font-bold text-gray-700 mb-2">Groupes concernés</label>
-				<div class="flex gap-2 items-center">
+				<div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
 					<select
 						id="groupeSelect"
 						bind:value={selectedGroupe}
-						class="px-10 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+						class="w-full sm:w-[320px] px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
 					>
 						<option value="" disabled selected>Choisir un groupe</option>
 						{#each groupes_options as groupe}
@@ -434,7 +477,7 @@
 					</select>
 					<button
 						type="button"
-						class="px-3 py-2 bg-[#4B3B7C] text-white rounded-md font-semibold hover:brightness-110"
+						class="w-full sm:w-auto sm:min-w-[120px] px-3 py-2 sm:px-6 sm:py-2 bg-[#4B3B7C] text-white rounded-md font-semibold hover:brightness-110"
 						onclick={() => {
 							if (selectedGroupe) {
 								if (selectedGroupe === 'Tous') {
@@ -494,11 +537,11 @@
 		</div>
 
 
-		<div class="border border-gray-300 bg-white rounded-md p-4 min-h-[300px]">
+		<div class="border border-gray-300 bg-white rounded-md p-2 sm:p-4 min-h-[200px] sm:min-h-[300px]">
 			<label class="block text-sm font-medium text-gray-700 mb-2">Contenu du devoir</label>
 			{#if editor}
 				<div class="control-group">
-					<div class="flex flex-wrap gap-2 p-2 border-b border-gray-200 mb-3">
+					<div class="flex flex-wrap sm:flex-nowrap gap-2 p-2 border-b border-gray-200 mb-3 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300">
 						<!-- Text Formatting Group -->
 						<div class="flex items-center space-x-1 mr-3">
 							<button
@@ -772,17 +815,17 @@
 			<div class="" bind:this={element} />
 		</div>
 
-		<div class="flex justify-end gap-4">
+		<div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-4">
 			<button
 				type="button"
-				class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+				class="w-full sm:w-auto px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
 				onclick={() => goto('/')}
 			>
 				Retour
 			</button>
 			<button
 				type="submit"
-				class="px-4 py-2 text-white rounded-md hover:brightness-110"
+				class="w-full sm:w-auto px-4 py-2 text-white rounded-md hover:brightness-110"
 				style="background-color: #4B3B7C"
 				disabled={!!dateErreur}
 			>
@@ -826,5 +869,27 @@
 
 	body, .page-ajouter-devoir {
 		background: #fff !important;
+	}
+
+	@media (max-width: 640px) {
+		.page-ajouter-devoir {
+			padding-left: 0 !important;
+			padding-right: 0 !important;
+		}
+		.prose {
+			font-size: 1rem;
+		}
+		.control-group > div {
+			overflow-x: auto;
+			white-space: nowrap;
+			}
+		.relative label {
+			font-size: 0.95rem;
+		}
+	}
+	@media (min-width: 640px) {
+		.page-ajouter-devoir {
+			max-width: 900px;
+		}
 	}
 </style>

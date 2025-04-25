@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { page } from '$app/stores';
+	import { get } from 'svelte/store';
+
 	let motDePasse = '';
 	let nouveauMotDePasse = '';
 	let confirmationNouveauMotDePasse = '';
@@ -63,32 +66,72 @@
 	}
 </script>
 
-<div class="flex min-h-screen bg-gray-50">
-	<!-- Navigation latérale -->
-	<div class="w-1/4 bg-white shadow-md p-6 rounded-lg fixed h-full">
-		<h2 class="text-xl font-bold text-gray-800 mb-4">Navigation</h2>
+<div class="flex flex-col sm:flex-row min-h-screen bg-gray-50">
+	<!-- Navigation mobile/tab style -->
+	<div class="w-full bg-white shadow-md px-2 sm:hidden mt-16 mb-4">
+		<div class="flex">
+			<a
+				href="/menu-profil"
+				class="flex-1 text-center py-3 font-semibold text-sm transition relative
+					{get(page)?.url?.pathname === '/menu-profil' ? 'text-[#4B3B7C]' : 'text-gray-700'}"
+			>
+				Détail du profil
+				{#if get(page)?.url?.pathname === '/menu-profil'}
+					<span class="absolute left-0 right-0 bottom-0 h-1 bg-yellow-400 rounded-t"></span>
+				{/if}
+			</a>
+			<a
+				href="/menu-profil/acces-securite"
+				class="flex-1 text-center py-3 font-semibold text-sm transition relative
+					{get(page)?.url?.pathname === '/menu-profil/acces-securite' ? 'text-[#4B3B7C]' : 'text-gray-700'}"
+			>
+				Accès et Sécurité
+				{#if get(page)?.url?.pathname === '/menu-profil/acces-securite'}
+					<span class="absolute left-0 right-0 bottom-0 h-1 bg-yellow-400 rounded-t"></span>
+				{/if}
+			</a>
+		</div>
+	</div>
+
+	<!-- Navigation latérale desktop -->
+	<div class="hidden sm:block w-full sm:w-1/4 bg-white shadow-md p-4 sm:p-6 rounded-lg sm:fixed sm:h-full mb-4 sm:mb-0">
+		<h2 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 text-center sm:text-left">Navigation</h2>
 		<ul class="space-y-4">
-			<li class="flex items-center space-x-3 hover:bg-[#EEEAF9] p-2 rounded-md transition">
-				<span class="i-ph:user-circle text-gray-600 text-lg"></span>
-				<a href="/menu-profil" class="text-gray-600 hover:text-[#4B3B7C] hover:underline">Détail du profil</a>
+			<li>
+				<a
+					href="/menu-profil"
+					class="block px-2 py-2 rounded-md font-semibold transition relative
+						{get(page)?.url?.pathname === '/menu-profil' ? 'bg-[#EEEAF9] text-[#4B3B7C]' : 'text-gray-700 hover:bg-[#EEEAF9]'}"
+				>
+					Détail du profil
+					{#if get(page)?.url?.pathname === '/menu-profil'}
+						<span class="absolute left-0 bottom-0 w-full h-1 bg-yellow-400 rounded-t"></span>
+					{/if}
+				</a>
 			</li>
-			<li class="flex items-center space-x-3 hover:bg-[#EEEAF9] p-2 rounded-md transition">
-				<span class="i-ph:lock text-[#4B3B7C] text-lg"></span>
-				<a href="/menu-profil/acces-securite" class="text-[#4B3B7C] font-semibold hover:underline hover:text-[#4B3B7C]">Accès et Sécurité</a>
+			<li>
+				<a
+					href="/menu-profil/acces-securite"
+					class="block px-2 py-2 rounded-md font-semibold transition relative
+						{get(page)?.url?.pathname === '/menu-profil/acces-securite' ? 'bg-[#EEEAF9] text-[#4B3B7C]' : 'text-gray-700 hover:bg-[#EEEAF9]'}"
+				>
+					Accès et Sécurité
+					{#if get(page)?.url?.pathname === '/menu-profil/acces-securite'}
+						<span class="absolute left-0 bottom-0 w-full h-1 bg-yellow-400 rounded-t"></span>
+					{/if}
+				</a>
 			</li>
 		</ul>
 	</div>
-	
 
 	<!-- Contenu principal -->
-	<div class="w-3/4 p-8 ml-1/4">
-		<h1 class="text-4xl font-bold mb-6 text-gray-800">Changer le mot de passe</h1>
-		<p class="text-gray-600 mb-8">
+	<div class="w-full sm:w-3/4 p-2 sm:p-8 sm:ml-[25%]">
+		<h1 class="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6 text-gray-800 text-center sm:text-left">Changer le mot de passe</h1>
+		<p class="text-gray-600 mb-6 sm:mb-8 text-center sm:text-left">
 			Changez le mot de passe que vous utilisez pour vous connecter à l'application.
 		</p>
-
-		<div class="space-y-6 bg-white p-6 rounded-lg shadow-md">
-				<div class="relative">
+		<div class="space-y-6 bg-white p-4 sm:p-6 rounded-lg shadow-md">
+			<div class="relative">
 				<input
 					id="motDePasse"
 					type="password"
@@ -131,11 +174,10 @@
 				{/if}
 			</div>
 		</div>
-
-		<div class="mt-6 flex justify-end">
+		<div class="mt-6 flex flex-col sm:flex-row justify-end">
 			<button
 				type="button"
-				class="px-4 py-2 text-white rounded-md hover:brightness-110 font-semibold"
+				class="w-full sm:w-auto px-4 py-2 text-white rounded-md hover:brightness-110 font-semibold"
 				style="background-color: #4B3B7C"
 				on:click={changerMotDePasse}
 			>
@@ -224,4 +266,32 @@
 		}
 	}
 
+	@media (max-width: 640px) {
+		.sm\:fixed { position: static !important; }
+		.sm\:ml-\[25\%\] { margin-left: 0 !important; }
+		.sm\:w-1\/4 { width: 100% !important; }
+		.sm\:w-3\/4 { width: 100% !important; }
+		.grid-cols-2 { grid-template-columns: 1fr !important; }
+		.gap-6 { gap: 1rem !important; }
+		.p-8 { padding: 0.5rem !important; }
+		.p-6 { padding: 1rem !important; }
+		.text-4xl { font-size: 1.5rem !important; }
+		.w-full.bg-white.shadow-md.px-2.sm\:hidden {
+			margin-top: 4rem !important; /* mt-16 */
+			margin-bottom: 1rem !important;
+		}
+	}
+	[role="tab"].active, .relative .active {
+		position: relative;
+	}
+	[role="tab"].active::after, .relative .active::after {
+		content: "";
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: 4px;
+		background: #FDB813;
+		border-radius: 2px 2px 0 0;
+	}
 </style>

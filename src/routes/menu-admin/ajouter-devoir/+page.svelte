@@ -15,7 +15,10 @@
 		groupes: ''
 	};
 
-	const groupesOptions = ['TD AB', 'TD CD', 'TD EF', 'TD GH', 'TD IJ'];
+	const groupesOptions = [
+		'TD AB', 'TD CD', 'TD EF', 'TD GH', 'TD IJ',
+		'TP A', 'TP B', 'TP C', 'TP D', 'TP E', 'TP F', 'TP G', 'TP H', 'TP I', 'TP J'
+	];
 
 	function validerChamps() {
 		erreurs = {

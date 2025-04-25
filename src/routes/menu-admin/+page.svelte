@@ -73,20 +73,20 @@
 {#if erreur}
 	<Error status={erreur.status} message={erreur.message} />
 {:else}
-	<div class="p-8 bg-gray-50 min-h-screen">
-		<h1 class="text-4xl font-bold mb-6 text-gray-800">Gestion des Utilisateurs</h1>
-		<p class="text-gray-600 mb-8">
+	<div class="p-2 sm:p-8 bg-gray-50 min-h-screen">
+		<h1 class="text-2xl sm:text-4xl font-bold mb-4 sm:mb-6 text-gray-800 text-center">Gestion des Utilisateurs</h1>
+		<p class="text-gray-600 mb-6 sm:mb-8 text-center">
 			Gérez les comptes utilisateur, modifiez leurs informations ou supprimez-les si nécessaire.
 		</p>
 
-		<div class="flex items-center justify-between mb-6">
+		<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
 			<input
 				type="text"
 				placeholder="Rechercher un utilisateur..."
 				bind:value={recherche}
-				class="w-1/3 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
+				class="w-full sm:w-1/3 px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-purple-500"
 			/>
-			<div class="flex flex-wrap items-center justify-center gap-4 mb-6">
+			<div class="flex flex-wrap items-center justify-center gap-2 sm:gap-4">
 				<span class="text-gray-600 font-semibold">Trier par :</span>
 				<select
 					bind:value={tri}
@@ -98,77 +98,76 @@
 			</div>
 		</div>
 
-					<!-- Bouton pour ajouter un utilisateur (visible uniquement pour les professeurs) -->
-					{#if utilisateur.role === 'PROFESSEUR'}
-					<div class="mt-10 mb-6 flex justify-end">
-						
-						<button
-							class="px-4 py-2 text-white rounded-md hover:brightness-110 font-semibold"
-							style="background-color: #4B3B7C"
-							onclick={allerAjouterUtilisateur}
-						>
-						Ajouter un utilisateur
-						</button>
-		
-					</div>
-					{/if}
+		{#if utilisateur.role === 'PROFESSEUR'}
+		<div class="mt-6 mb-4 flex justify-end">
+			<button
+				class="w-full sm:w-auto px-4 py-2 text-white rounded-md hover:brightness-110 font-semibold"
+				style="background-color: #4B3B7C"
+				onclick={allerAjouterUtilisateur}
+			>
+				Ajouter un utilisateur
+			</button>
+		</div>
+		{/if}
 
-		<table class="w-full border-collapse bg-white shadow-md rounded-lg overflow-hidden">
-			<thead class="bg-purple-100 text-gray-800">
-				<tr>
-					<th class="px-6 py-3 text-left font-semibold">Nom</th>
-					<th class="px-6 py-3 text-left font-semibold">Email</th>
-					<th class="px-6 py-3 text-left font-semibold">Rôle</th>
-					<th class="px-6 py-3 text-center font-semibold">Actions</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each utilisateursAffiches as utilisateur}
-					<tr class="hover:bg-gray-50">
-						<td class="px-6 py-4 border-b">{utilisateur.nom}</td>
-						<td class="px-6 py-4 border-b">{utilisateur.email}</td>
-						<td class="px-6 py-4 border-b">{utilisateur.role}</td>
-						<td class="px-6 py-4 border-b text-center">
-							{#if utilisateur.role !== 'PROFESSEUR'}
-								<button
-									class="px-4 py-2 bg-[#FDB813] text-white rounded-md hover:bg-[#EAA10D] mr-2 font-semibold"
-									onclick={() => editerUtilisateur(utilisateur.id)}
-								>
-									Éditer
-								</button>
-								<button
-									class="px-4 py-2 bg-[#CAC3D6] text-[#3B2A5B] rounded-md hover:bg-[#B5ADC4] font-semibold"
-									onclick={() => confirmerSuppressionUtilisateur(utilisateur.id)}
-								>
-									Supprimer
-								</button>
-							{/if}
-						</td>
-					</tr>
-				{:else}
+		<div class="overflow-x-auto rounded-lg shadow-md">
+			<table class="w-full border-collapse bg-white rounded-lg min-w-[600px]">
+				<thead class="bg-purple-100 text-gray-800">
 					<tr>
-						<td colspan="4" class="text-center text-gray-500 py-6">Aucun utilisateur trouvé</td>
+						<th class="px-4 sm:px-6 py-3 text-left font-semibold">Nom</th>
+						<th class="px-4 sm:px-6 py-3 text-left font-semibold">Email</th>
+						<th class="px-4 sm:px-6 py-3 text-left font-semibold">Rôle</th>
+						<th class="px-4 sm:px-6 py-3 text-center font-semibold">Actions</th>
 					</tr>
-				{/each}
-			</tbody>
-		</table>
+				</thead>
+				<tbody>
+					{#each utilisateursAffiches as utilisateur}
+						<tr class="hover:bg-gray-50">
+							<td class="px-4 sm:px-6 py-4 border-b">{utilisateur.nom}</td>
+							<td class="px-4 sm:px-6 py-4 border-b">{utilisateur.email}</td>
+							<td class="px-4 sm:px-6 py-4 border-b">{utilisateur.role}</td>
+							<td class="px-4 sm:px-6 py-4 border-b text-center">
+								{#if utilisateur.role !== 'PROFESSEUR'}
+									<button
+										class="w-full sm:w-auto mb-2 sm:mb-0 px-4 py-2 bg-[#FDB813] text-white rounded-md hover:bg-[#EAA10D] mr-0 sm:mr-2 font-semibold"
+										onclick={() => editerUtilisateur(utilisateur.id)}
+									>
+										Éditer
+									</button>
+									<button
+										class="w-full sm:w-auto px-4 py-2 bg-[#CAC3D6] text-[#3B2A5B] rounded-md hover:bg-[#B5ADC4] font-semibold"
+										onclick={() => confirmerSuppressionUtilisateur(utilisateur.id)}
+									>
+										Supprimer
+									</button>
+								{/if}
+							</td>
+						</tr>
+					{:else}
+						<tr>
+							<td colspan="4" class="text-center text-gray-500 py-6">Aucun utilisateur trouvé</td>
+						</tr>
+					{/each}
+				</tbody>
+			</table>
+		</div>
 
-		<div class="flex justify-between items-center mt-6">
+		<div class="flex flex-col sm:flex-row justify-between items-center mt-6 gap-2">
 			{#if nombreDePages > 1}
 				{#if pageActuelle > 1}
 					<button
-						class="px-4 py-2 bg-[#CAC3D6] text-[#3B2A5B] rounded-md hover:bg-[#B5ADC4] font-semibold"
+						class="w-full sm:w-auto px-4 py-2 bg-[#CAC3D6] text-[#3B2A5B] rounded-md hover:bg-[#B5ADC4] font-semibold"
 						onclick={() => (pageActuelle = Math.max(1, pageActuelle - 1))}
 					>
 						Précédent
 					</button>
 				{/if}
-				<div class="text-gray-600 font-semibold">
+				<div class="text-gray-600 font-semibold text-center">
 					Page {pageActuelle} sur {nombreDePages}
 				</div>
 				{#if pageActuelle < nombreDePages}
 					<button
-						class="px-4 py-2 bg-[#CAC3D6] text-[#3B2A5B] rounded-md hover:bg-[#B5ADC4] font-semibold"
+						class="w-full sm:w-auto px-4 py-2 bg-[#CAC3D6] text-[#3B2A5B] rounded-md hover:bg-[#B5ADC4] font-semibold"
 						onclick={() => (pageActuelle = Math.min(nombreDePages, pageActuelle + 1))}
 					>
 						Suivant
@@ -184,5 +183,14 @@
 		background-position: right 0rem center; /* Ajoute un espace entre le texte et la flèche */
 		background-repeat: no-repeat;
 		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='gray'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+	}
+	@media (max-width: 640px) {
+		.p-8 { padding: 0.5rem !important; }
+		.mb-6 { margin-bottom: 1rem !important; }
+		.mb-8 { margin-bottom: 1.5rem !important; }
+		.mt-10 { margin-top: 1.5rem !important; }
+		.mt-6 { margin-top: 1rem !important; }
+		.text-4xl { font-size: 1.5rem !important; }
+		.table-responsive { overflow-x: auto; }
 	}
 </style>
