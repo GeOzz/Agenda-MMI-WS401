@@ -1,3 +1,8 @@
+<svelte:head>
+	<title>Inscription | Agenda MMI</title>
+	<meta name="description" content="Créez un compte étudiant ou enseignant sur l'agenda MMI pour accéder à vos devoirs et informations." />
+</svelte:head>
+
 <script lang="ts">
     import type { IUtilisateur } from '$lib/interfaces/IUtilisateur';
     import { EGroupeTD, EGroupeTP, EPromotion, ERoleUtilisateur } from '$lib/interfaces/IUtilisateur';

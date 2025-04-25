@@ -1,3 +1,8 @@
+<svelte:head>
+	<title>Connexion | Agenda MMI</title>
+	<meta name="description" content="Connectez-vous à votre compte Agenda MMI pour accéder à vos devoirs et informations personnelles." />
+</svelte:head>
+
 <script lang="ts">
     import Login from '$lib/components/Login.svelte';
     import type { IUtilisateur } from '$lib/interfaces/IUtilisateur';

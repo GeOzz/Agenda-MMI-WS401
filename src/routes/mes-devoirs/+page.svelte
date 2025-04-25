@@ -1,3 +1,8 @@
+<svelte:head>
+	<title>Mes devoirs | Agenda MMI</title>
+	<meta name="description" content="Consultez la liste de vos devoirs à faire et déjà faits sur l'agenda MMI." />
+</svelte:head>
+
 <script lang="ts">
 	import type { IDevoir } from '$lib/interfaces/IUtilisateur';
 	import { onMount } from 'svelte';

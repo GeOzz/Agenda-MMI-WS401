@@ -97,6 +97,11 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Accueil | Agenda MMI</title>
+	<meta name="description" content="Bienvenue sur l'agenda MMI : retrouvez vos devoirs à faire, l'historique des actions et toutes les informations importantes pour les étudiants et enseignants MMI." />
+</svelte:head>
+
 {#await AfficherOuNon then value}
 	{#if STORE.connected === true}
 		<!-- Barre de navigation responsive mobile : chaque bouton est indépendant -->

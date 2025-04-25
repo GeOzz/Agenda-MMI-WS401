@@ -1,3 +1,8 @@
+<svelte:head>
+	<title>Profil | Agenda MMI</title>
+	<meta name="description" content="Gérez les informations de votre profil, votre sécurité et vos accès sur l'agenda MMI." />
+</svelte:head>
+
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';

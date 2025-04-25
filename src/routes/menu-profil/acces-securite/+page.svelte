@@ -66,6 +66,11 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Accès et sécurité | Agenda MMI</title>
+	<meta name="description" content="Modifiez vos accès et paramètres de sécurité sur l'agenda MMI." />
+</svelte:head>
+
 <div class="flex flex-col sm:flex-row min-h-screen bg-gray-50">
 	<!-- Navigation mobile/tab style -->
 	<div class="w-full bg-white shadow-md px-2 sm:hidden mt-16 mb-4">

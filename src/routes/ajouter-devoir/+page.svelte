@@ -1,3 +1,8 @@
+<svelte:head>
+	<title>Ajouter un devoir | Agenda MMI</title>
+	<meta name="description" content="Ajoutez un nouveau devoir pour votre promotion ou groupe dans l'agenda MMI." />
+</svelte:head>
+
 <script lang="ts">
 	import { Color } from '@tiptap/extension-color';
 	import ListItem from '@tiptap/extension-list-item';

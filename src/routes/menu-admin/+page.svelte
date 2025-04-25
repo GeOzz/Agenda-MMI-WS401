@@ -70,6 +70,11 @@
 	$: nombreDePages = Math.ceil(utilisateursFiltres.length / utilisateursParPage);
 </script>
 
+<svelte:head>
+	<title>Administration | Agenda MMI</title>
+	<meta name="description" content="Espace d'administration pour la gestion des utilisateurs et des devoirs dans l'agenda MMI." />
+</svelte:head>
+
 {#if erreur}
 	<Error status={erreur.status} message={erreur.message} />
 {:else}
