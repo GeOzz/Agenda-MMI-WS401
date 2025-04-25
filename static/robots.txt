@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mmi23b01.sae401.ovh/sitemap.xml
