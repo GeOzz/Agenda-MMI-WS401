@@ -95,18 +95,30 @@
 	function setActivePage(page) {
 		activePage = page;
 	}
+
+	async function getUtilisateur(id: number): Promise<{ nom: string; prenom: string }> {
+		const response = await fetch(`/api/utilisateur/${id}`);
+		const utilisateur = await response.json();
+		return { nom: utilisateur.nom, prenom: utilisateur.prenom };
+	}
 </script>
 
 <svelte:head>
 	<title>Accueil | Agenda MMI</title>
-	<meta name="description" content="Bienvenue sur l'agenda MMI : retrouvez vos devoirs à faire, l'historique des actions et toutes les informations importantes pour les étudiants et enseignants MMI." />
+	<meta
+		name="description"
+		content="Bienvenue sur l'agenda MMI : retrouvez vos devoirs à faire, l'historique des actions et toutes les informations importantes pour les étudiants et enseignants MMI."
+	/>
 </svelte:head>
 
 {#await AfficherOuNon then value}
 	{#if STORE.connected === true}
 		<!-- Barre de navigation responsive mobile : chaque bouton est indépendant -->
 		{#if activePage === 'accueil'}
-			<div class="w-full flex md:hidden bg-gray-100 shadow-md z-40" style="position:fixed; top:95px; left:0; right:0;">
+			<div
+				class="w-full flex md:hidden bg-gray-100 shadow-md z-40"
+				style="position:fixed; top:95px; left:0; right:0;"
+			>
 				<button
 					class="flex-1 py-4 text-center font-bold text-[#4D3677] bg-white shadow-md border-b-4 border-yellow-500 rounded-t-lg"
 					aria-current="page"
@@ -123,7 +135,10 @@
 				</button>
 			</div>
 		{:else if activePage === 'historique'}
-			<div class="w-full flex md:hidden bg-gray-100 shadow-md z-40" style="position:fixed; top:100px; left:0; right:0;">
+			<div
+				class="w-full flex md:hidden bg-gray-100 shadow-md z-40"
+				style="position:fixed; top:100px; left:0; right:0;"
+			>
 				<button
 					class="flex-1 py-4 text-center font-bold text-gray-700 bg-gray-100 hover:bg-gray-200 border-b-4 border-transparent rounded-t-lg"
 					on:click={() => setActivePage('accueil')}
@@ -257,17 +272,21 @@
 								{#if devoirs.length > 0}
 									<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 										{#each devoirs as devoir}
-											<div class="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200">
+											<div
+												class="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200"
+											>
 												<div class="bg-[#4D3677] text-white p-4">
 													<h3 class="text-lg font-bold truncate">{devoir.titre}</h3>
 													<p class="text-sm">{devoir.matiere}</p>
 												</div>
 												<div class="p-4">
 													<p class="text-gray-600 text-sm mb-2">
-														<strong>Expire le :</strong> {new Date(devoir.expire_le_timestamp).toLocaleDateString()}
+														<strong>Expire le :</strong>
+														{new Date(devoir.expire_le_timestamp).toLocaleDateString()}
 													</p>
 													<p class="text-gray-600 text-sm mb-4 truncate">
-														<strong>Description :</strong> {devoir.markdown || 'Aucune description'}
+														<strong>Description :</strong>
+														{devoir.markdown || 'Aucune description'}
 													</p>
 													<a
 														href={`/devoir/${devoir.id}`}
@@ -286,7 +305,8 @@
 						{/each}
 					{:else}
 						<h1 class="text-4xl font-bold mb-10">
-							Bienvenue {STORE.utilisateur?.nom}, {#if devoirs_a_faire.length > 0}vous avez {devoirs_a_faire.length} devoirs à rendre.{:else}vous n'avez pas de devoirs à rendre.{/if}
+							Bienvenue {STORE.utilisateur?.nom}, {#if devoirs_a_faire.length > 0}vous avez {devoirs_a_faire.length}
+								devoirs à rendre.{:else}vous n'avez pas de devoirs à rendre.{/if}
 						</h1>
 
 						<!-- Section des devoirs à faire -->
@@ -295,53 +315,74 @@
 							{#if devoirs_a_faire.length > 0}
 								<div class="space-y-4 mb-8">
 									{#each devoirs_a_faire as devoir (devoir.id)}
-										<div
-											class="shadow-md rounded-lg p-8 border-t border-b border-gray-300 flex justify-between items-center transition-opacity duration-300"
-										>
-											<div class="flex items-center">
-												<div
-													class="w-16 h-16 rounded-full bg-[#4D3677] flex items-center justify-center text-white font-bold"
-												>
-													{devoir.matiere.slice(0, 2).toUpperCase()}
+										{#await getUtilisateur(devoir.utilisateur_id_createur)}
+											<!-- promise is pending -->
+										{:then utilisateur}
+											<div
+												class="shadow-md rounded-lg p-8 border-t border-b border-gray-300 flex justify-between items-center transition-opacity duration-300"
+											>
+												<div class="flex items-center">
+													<div
+														class="w-16 h-16 rounded-full bg-[#4D3677] flex items-center justify-center text-white font-bold"
+													>
+														{devoir.matiere.slice(0, 2).toUpperCase()}
+													</div>
+													<div class="ml-4">
+														<h2 class="text-3xl font-semibold mb-2">
+															{devoir.matiere} - {devoir.titre}
+														</h2>
+														<p class="text-gray-500 text-sm">
+															Ajouté par <span class="font-bold"
+																>{utilisateur.nom} {utilisateur.prenom}</span
+															>
+															le
+															<span class="font-bold"
+																>{new Date(devoir.timestamp).toLocaleDateString('fr-FR')}</span
+															>
+															à
+															<span class="font-bold"
+																>{new Date(devoir.timestamp).toLocaleTimeString('fr-FR')}</span
+															>
+														</p>
+														<p class="text-gray-500 text-lg mt-4">
+															Rendu prévu pour le <span class="font-bold"
+																>{new Date(devoir.expire_le_timestamp).toLocaleDateString(
+																	'fr-FR'
+																)}</span
+															>
+															à
+															<span class="font-bold"
+																>{new Date(devoir.expire_le_timestamp).toLocaleTimeString(
+																	'fr-FR'
+																)}</span
+															>
+														</p>
+													</div>
 												</div>
-												<div class="ml-4">
-													<h2 class="text-3xl font-semibold mb-2">{devoir.matiere} - {devoir.titre}</h2>
-													<p class="text-gray-500 text-sm">
-														Ajouté par <span class="font-bold"
-															>{STORE.utilisateur?.nom} {STORE.utilisateur?.prenom}</span
+												<div class="flex space-x-2">
+													<button
+														on:click={() => handleDejaFait(devoir)}
+														class="px-4 py-2 flex items-center bg-[#DDD4EC] text-[#3B2A5B] font-bold rounded-md transition duration-150 ease-in-out hover:bg-[#B5ADC4]"
+													>
+														<svg
+															xmlns="http://www.w3.org/2000/svg"
+															class="h-5 w-5 mr-2"
+															fill="none"
+															viewBox="0 0 24 24"
+															stroke="currentColor"
 														>
-														le
-														<span class="font-bold"
-															>{new Date(devoir.timestamp).toLocaleDateString('fr-FR')}</span
-														>
-														à
-														<span class="font-bold"
-															>{new Date(devoir.timestamp).toLocaleTimeString('fr-FR')}</span
-														>
-													</p>
-													<p class="text-gray-500 text-lg mt-4">
-														Rendu prévu pour le <span class="font-bold"
-															>{new Date(devoir.expire_le_timestamp).toLocaleDateString('fr-FR')}</span
-														>
-														à
-														<span class="font-bold"
-															>{new Date(devoir.expire_le_timestamp).toLocaleTimeString('fr-FR')}</span
-														>
-													</p>
+															<path
+																stroke-linecap="round"
+																stroke-linejoin="round"
+																stroke-width="2"
+																d="M5 13l4 4L19 7"
+															/>
+														</svg>
+														Marquer comme fait
+													</button>
 												</div>
 											</div>
-											<div class="flex space-x-2">
-												<button
-													on:click={() => handleDejaFait(devoir)}
-													class="px-4 py-2 flex items-center bg-[#DDD4EC] text-[#3B2A5B] font-bold rounded-md transition duration-150 ease-in-out hover:bg-[#B5ADC4]"
-												>
-													<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-													</svg>
-													Marquer comme fait
-												</button>
-											</div>
-										</div>
+										{/await}
 									{/each}
 								</div>
 							{:else}
@@ -356,54 +397,75 @@
 							<h2 class="text-2xl font-bold mb-4 text-[#4D3677]">Devoirs déjà faits</h2>
 							{#if DEVOIRS.filter((devoir) => devoirs_deja_fait.includes(devoir.id)).length > 0}
 								<div class="space-y-4 mb-8">
-									{#each DEVOIRS.filter((devoir) => devoirs_deja_fait.includes(devoir.id)) as devoir (devoir.id)}
-										<div
-											class="shadow-md rounded-lg p-8 border-t border-b border-gray-300 flex justify-between items-center opacity-75 transition-opacity duration-300"
-										>
-											<div class="flex items-center">
-												<div
-													class="w-16 h-16 rounded-full bg-[#4D3677] flex items-center justify-center text-white font-bold"
-												>
-													{devoir.matiere.slice(0, 2).toUpperCase()}
+									{#each DEVOIRS.filter( (devoir) => devoirs_deja_fait.includes(devoir.id) ) as devoir (devoir.id)}
+										{#await getUtilisateur(devoir.utilisateur_id_createur)}
+											<!-- promise is pending -->
+										{:then utilisateur}
+											<div
+												class="shadow-md rounded-lg p-8 border-t border-b border-gray-300 flex justify-between items-center opacity-75 transition-opacity duration-300"
+											>
+												<div class="flex items-center">
+													<div
+														class="w-16 h-16 rounded-full bg-[#4D3677] flex items-center justify-center text-white font-bold"
+													>
+														{devoir.matiere.slice(0, 2).toUpperCase()}
+													</div>
+													<div class="ml-4">
+														<h2 class="text-3xl font-semibold mb-2">
+															{devoir.matiere} - {devoir.titre}
+														</h2>
+														<p class="text-gray-500 text-sm">
+															Ajouté par <span class="font-bold"
+																>{utilisateur.nom} {utilisateur.prenom}</span
+															>
+															le
+															<span class="font-bold"
+																>{new Date(devoir.timestamp).toLocaleDateString('fr-FR')}</span
+															>
+															à
+															<span class="font-bold"
+																>{new Date(devoir.timestamp).toLocaleTimeString('fr-FR')}</span
+															>
+														</p>
+														<p class="text-gray-500 text-lg mt-4">
+															Rendu prévu pour le <span class="font-bold"
+																>{new Date(devoir.expire_le_timestamp).toLocaleDateString(
+																	'fr-FR'
+																)}</span
+															>
+															à
+															<span class="font-bold"
+																>{new Date(devoir.expire_le_timestamp).toLocaleTimeString(
+																	'fr-FR'
+																)}</span
+															>
+														</p>
+													</div>
 												</div>
-												<div class="ml-4">
-													<h2 class="text-3xl font-semibold mb-2">{devoir.matiere} - {devoir.titre}</h2>
-													<p class="text-gray-500 text-sm">
-														Ajouté par <span class="font-bold"
-															>{STORE.utilisateur?.nom} {STORE.utilisateur?.prenom}</span
+												<div class="flex space-x-2">
+													<button
+														on:click={() => handleAFaire(devoir)}
+														class="px-4 py-2 flex items-center bg-[#F7B000] text-[#3B2A5B] font-bold rounded-md transition duration-150 ease-in-out hover:bg-[#D69A00]"
+													>
+														<svg
+															xmlns="http://www.w3.org/2000/svg"
+															class="h-5 w-5 mr-2"
+															fill="none"
+															viewBox="0 0 24 24"
+															stroke="currentColor"
 														>
-														le
-														<span class="font-bold"
-															>{new Date(devoir.timestamp).toLocaleDateString('fr-FR')}</span
-														>
-														à
-														<span class="font-bold"
-															>{new Date(devoir.timestamp).toLocaleTimeString('fr-FR')}</span
-														>
-													</p>
-													<p class="text-gray-500 text-lg mt-4">
-														Rendu prévu pour le <span class="font-bold"
-															>{new Date(devoir.expire_le_timestamp).toLocaleDateString('fr-FR')}</span
-														>
-														à
-														<span class="font-bold"
-															>{new Date(devoir.expire_le_timestamp).toLocaleTimeString('fr-FR')}</span
-														>
-													</p>
+															<path
+																stroke-linecap="round"
+																stroke-linejoin="round"
+																stroke-width="2"
+																d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2v6"
+															/>
+														</svg>
+														Remettre à faire
+													</button>
 												</div>
 											</div>
-											<div class="flex space-x-2">
-												<button
-													on:click={() => handleAFaire(devoir)}
-													class="px-4 py-2 flex items-center bg-[#F7B000] text-[#3B2A5B] font-bold rounded-md transition duration-150 ease-in-out hover:bg-[#D69A00]"
-												>
-													<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-														<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2v6" />
-													</svg>
-													Remettre à faire
-												</button>
-											</div>
-										</div>
+										{/await}
 									{/each}
 								</div>
 							{:else}
@@ -523,7 +585,9 @@
 	}
 	/* Ajout d'une animation pour les cartes */
 	.bg-white {
-		transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+		transition:
+			transform 0.2s ease-in-out,
+			box-shadow 0.2s ease-in-out;
 	}
 	.bg-white:hover {
 		transform: translateY(-5px);
@@ -532,13 +596,13 @@
 	/* Ajout d'un style pour permettre le défilement dans la section historique */
 	nav .overflow-y-auto {
 		scrollbar-width: thin; /* Pour les navigateurs compatibles */
-		scrollbar-color: #705B97 #f7fafc; /* Couleurs personnalisées */
+		scrollbar-color: #705b97 #f7fafc; /* Couleurs personnalisées */
 	}
 	nav .overflow-y-auto::-webkit-scrollbar {
 		width: 8px; /* Largeur de la barre de défilement */
 	}
 	nav .overflow-y-auto::-webkit-scrollbar-thumb {
-		background-color: #705B97; /* Couleur violette */
+		background-color: #705b97; /* Couleur violette */
 		border-radius: 4px; /* Coins arrondis */
 	}
 	nav .overflow-y-auto::-webkit-scrollbar-track {
